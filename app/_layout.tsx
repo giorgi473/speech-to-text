@@ -1,22 +1,25 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
+import { RecordProvider } from "./RecordContext";
 
 export default function RootLayout() {
   return (
     <>
       <StatusBar style="dark" />
       <View style={styles.safe}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="history"
-            options={{
-              headerShown: false,
-              animation: "slide_from_right",
-            }}
-          />
-        </Stack>
+        <RecordProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+              name="history"
+              options={{
+                headerShown: false,
+                animation: "slide_from_right",
+              }}
+            />
+          </Stack>
+        </RecordProvider>
       </View>
     </>
   );
