@@ -1,74 +1,22 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
-  SectionList,
   StyleSheet,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ScrollView,
 } from "react-native";
+import { useRecords } from "./RecordContext";
 
-// ── Mock data ──────────────────────────────────────────────────────────────────
-const HISTORY_DATA = [
-  {
-    title: "დღეს",
-    data: [
-      {
-        id: "1",
-        preview:
-          "ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძ...",
-      },
-      {
-        id: "2",
-        preview:
-          "ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძ...",
-      },
-    ],
-  },
-  {
-    title: "გუშინ",
-    data: [
-      {
-        id: "3",
-        preview:
-          "ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძ...",
-      },
-      {
-        id: "4",
-        preview:
-          "ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძ...",
-      },
-    ],
-  },
-  {
-    title: "11 მარტი",
-    data: [
-      {
-        id: "5",
-        preview:
-          "ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძ...",
-      },
-      {
-        id: "6",
-        preview:
-          "ტრანსკრიფციის სერვისი ხმას ტექსტად გარდაქმნის სწრაფად და მარტივად. მომხმარებელს შეუძ...",
-      },
-    ],
-  },
-];
-
-// ── Language options ───────────────────────────────────────────────────────────
 const LANGUAGES = [
   { code: "ka", label: "ქართული", flag: "🇬🇪" },
   { code: "en", label: "English", flag: "🇬🇧" },
   { code: "ru", label: "Русский", flag: "🇷🇺" },
 ];
 
-type HistoryItem = { id: string; preview: string };
-
-// ── User Profile Row ───────────────────────────────────────────────────────────
 function UserProfileRow() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState(LANGUAGES[0]);
@@ -80,12 +28,10 @@ function UserProfileRow() {
 
   return (
     <View style={styles.profileRow}>
-      {/* Avatar */}
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>A</Text>
       </View>
 
-      {/* Email + Badge */}
       <View style={styles.profileInfo}>
         <Text style={styles.profileEmail}>achi.teruashvili777@gmail.com</Text>
         <View style={styles.badgeWrapper}>
@@ -101,7 +47,6 @@ function UserProfileRow() {
         </View>
       </View>
 
-      {/* Language Selector */}
       <View>
         <TouchableOpacity
           style={styles.langBtn}
@@ -117,10 +62,8 @@ function UserProfileRow() {
           />
         </TouchableOpacity>
 
-        {/* Dropdown */}
         {dropdownOpen && (
           <>
-            {/* Backdrop to close on outside tap */}
             <TouchableWithoutFeedback onPress={() => setDropdownOpen(false)}>
               <View style={styles.backdrop} />
             </TouchableWithoutFeedback>
@@ -163,28 +106,11 @@ function UserProfileRow() {
   );
 }
 
-// ── History Card ───────────────────────────────────────────────────────────────
-function HistoryCard({ item }: { item: HistoryItem }) {
-  return (
-    <View style={styles.card}>
-      <TouchableOpacity style={styles.cardEditBtn}>
-        <Ionicons name="create-outline" size={20} color="#2D7CF6" />
-      </TouchableOpacity>
-      <Text style={styles.cardText} numberOfLines={2}>
-        {item.preview}
-      </Text>
-      <TouchableOpacity style={styles.cardDeleteBtn}>
-        <Ionicons name="trash-outline" size={20} color="#2D7CF6" />
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-// ── Screen ─────────────────────────────────────────────────────────────────────
 export default function HistoryScreen() {
+  const { records } = useRecords();
+
   return (
     <View style={styles.container}>
-      {/* ── Header ── */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="chevron-back" size={26} color="#333" />
@@ -192,29 +118,35 @@ export default function HistoryScreen() {
         <UserProfileRow />
       </View>
 
-      {/* ── List ── */}
-      <SectionList
-        sections={HISTORY_DATA}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        renderSectionHeader={({ section: { title } }) => (
-          <Text style={styles.sectionHeader}>{title}</Text>
-        )}
-        renderItem={({ item }) => <HistoryCard item={item} />}
-        stickySectionHeadersEnabled={false}
-      />
+      <View style={styles.textWrapper}>
+        <ScrollView
+          style={styles.textScroll}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={true}
+        >
+          {records.length === 0 ? (
+            <Text style={styles.emptyText}>ჩანაწერები ჯერ არ არის</Text>
+          ) : (
+            records.map((r) => (
+              <View key={r.id} style={styles.card}>
+                <Text style={styles.recordMeta}>
+                  {r.date} · {r.duration}
+                </Text>
+                <Text style={styles.mainText}>{r.text}</Text>
+              </View>
+            ))
+          )}
+        </ScrollView>
+      </View>
     </View>
   );
 }
 
-// ── Styles ─────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
   },
-
-  // Header
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -230,8 +162,6 @@ const styles = StyleSheet.create({
   backBtn: {
     padding: 8,
   },
-
-  // Profile Row
   profileRow: {
     flex: 1,
     flexDirection: "row",
@@ -260,8 +190,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#111",
   },
-
-  // Badge
   badgeWrapper: {
     alignSelf: "flex-start",
     marginTop: 3,
@@ -282,8 +210,6 @@ const styles = StyleSheet.create({
     top: -6,
     right: -6,
   },
-
-  // Language button
   langBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -297,8 +223,6 @@ const styles = StyleSheet.create({
     marginLeft: 3,
     marginTop: 1,
   },
-
-  // Backdrop
   backdrop: {
     position: "absolute",
     top: -200,
@@ -307,8 +231,6 @@ const styles = StyleSheet.create({
     bottom: -1000,
     zIndex: 200,
   },
-
-  // Dropdown
   dropdown: {
     position: "absolute",
     top: 36,
@@ -362,43 +284,38 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  // List
-  listContent: {
+  textWrapper: {
+    flex: 1,
     padding: 16,
-    paddingBottom: 40,
   },
-  sectionHeader: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#888",
-    marginTop: 16,
-    marginBottom: 8,
-    marginLeft: 2,
+  textScroll: {
+    flex: 1,
   },
-
-  // Card
+  // აქ ვაკეთებთ ლისტის padding-ს და gap-ს
+  listContent: {
+    paddingBottom: 24,
+    gap: 12,
+  },
+  // თითო ჩანაწერის ქარდი
   card: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    padding: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: "#e0e8ff",
-    padding: 14,
-    marginBottom: 10,
   },
-  cardEditBtn: {
-    padding: 4,
-    marginRight: 10,
+  recordMeta: {
+    fontSize: 11,
+    color: "#888",
+    marginBottom: 4,
   },
-  cardText: {
-    flex: 1,
-    fontSize: 14,
+  mainText: {
+    fontSize: 15,
     color: "#333",
-    lineHeight: 20,
+    lineHeight: 22,
   },
-  cardDeleteBtn: {
-    padding: 4,
-    marginLeft: 10,
+  emptyText: {
+    fontSize: 14,
+    color: "#999",
   },
 });

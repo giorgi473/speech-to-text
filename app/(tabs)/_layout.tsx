@@ -1,13 +1,7 @@
+import { createContext, useContext, useRef, useState } from "react";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router, Tabs } from "expo-router";
-import { createContext, useContext, useRef, useState } from "react";
-import {
-  Animated,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Animated, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -178,9 +172,9 @@ function RecordTabButton(props: any) {
 const tabBtnStyles = StyleSheet.create({
   wrapper: { flex: 1, alignItems: "center", justifyContent: "center" },
   square: {
-    width: 55,
-    height: 55,
-    borderRadius: 8,
+    width: 50,
+    height: 50,
+    borderRadius: 5,
     backgroundColor: "#2D7CF6",
     alignItems: "center",
     justifyContent: "center",
@@ -200,8 +194,8 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           tabBarStyle: {
-            paddingBottom: 9,
-            paddingTop: 9,
+            paddingBottom: 8,
+            paddingTop: 8,
             height: 75,
             borderTopWidth: 0,
             borderTopColor: "transparent",
