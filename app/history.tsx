@@ -34,11 +34,10 @@ function UserProfileRow() {
   return (
     <View style={styles.profileRow}>
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>A</Text>
+        <Text style={styles.avatarText}>G</Text>
       </View>
-
       <View style={styles.profileInfo}>
-        <Text style={styles.profileEmail}>achi.teruashvili777@gmail.com</Text>
+        <Text style={styles.profileEmail}>giorgi.kavtaradze@gmail.com</Text>
         <View style={styles.badgeWrapper}>
           <View style={styles.premiumBadge}>
             <Text style={styles.premiumText}>პრემიუმი</Text>
@@ -82,7 +81,8 @@ function UserProfileRow() {
                     index === 0 && styles.dropdownItemFirst,
                     index === LANGUAGES.length - 1 && styles.dropdownItemLast,
                     index < LANGUAGES.length - 1 && styles.dropdownItemBorder,
-                    selectedLang.code === lang.code && styles.dropdownItemActive,
+                    selectedLang.code === lang.code &&
+                      styles.dropdownItemActive,
                   ]}
                   onPress={() => handleSelect(lang)}
                   activeOpacity={0.7}
@@ -92,7 +92,7 @@ function UserProfileRow() {
                     style={[
                       styles.dropdownLabel,
                       selectedLang.code === lang.code &&
-                      styles.dropdownLabelActive,
+                        styles.dropdownLabelActive,
                     ]}
                   >
                     {lang.label}
@@ -131,7 +131,7 @@ function SwipeableCard({
   };
 
   const renderRightActions = (
-    progress: Animated.AnimatedInterpolation<number>
+    progress: Animated.AnimatedInterpolation<number>,
   ) => {
     const translateX = progress.interpolate({
       inputRange: [0, 1],
