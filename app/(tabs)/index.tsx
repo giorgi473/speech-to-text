@@ -1,5 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Animated,
   SafeAreaView,
@@ -8,11 +8,11 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Modal,
 } from "react-native";
 import { useRecording } from "./_layout";
 import { router } from "expo-router";
 import { useRecords } from "../RecordContext";
+import SettingsModal, { SettingsValues } from "../../components/SettingsModal";
 
 const LIVE_CHUNKS = [
   "ტექნოლოგიები ყოველდღიურად იცვლება ",
@@ -44,13 +44,29 @@ const LIVE_CHUNKS = [
   "ამ რევოლუციურ ტექნოლოგიას. ",
 ];
 
+// ენის label-ების მაპი badge-სთვის
+const LANGUAGE_LABELS: Record<string, string> = {
+  ka: "ქართული",
+  en: "English",
+  ru: "Русский",
+  de: "Deutsch",
+  fr: "Français",
+};
+
 export default function IndexScreen() {
   const { isRecording } = useRecording();
-  const { addRecord, records } = useRecords();
+  const { addRecord } = useRecords();
 
   const [liveText, setLiveText] = useState("");
   const [showParams, setShowParams] = useState(false);
-  const [language, setLanguage] = useState("ქართული");
+  const [settings, setSettings] = useState<SettingsValues>({
+    language: "ka",
+    speakerOutput: "diarization",
+    sttModel: "stt1",
+    microphone: "default",
+    punctuation: true,
+    autoCorrect: false,
+  });
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -61,6 +77,7 @@ export default function IndexScreen() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scrollRef = useRef<ScrollView>(null);
 
+  // Cursor blink
   useEffect(() => {
     const blink = Animated.loop(
       Animated.sequence([
@@ -147,11 +164,8 @@ export default function IndexScreen() {
 
       if (trimmed) {
         const duration = formatTime(elapsedSeconds);
-        const date = "ახლა"; // შეგიძლია ნამდვილი თარიღით ჩაანაცვლო
-
-        const rec = addRecord({ text: trimmed, date, duration });
-
-        // სურვილის მიხედვით ერთი ბოლო დამატებული რომ გახსნას:
+        const date = "ახლა";
+        addRecord({ text: trimmed, date, duration });
         router.push("/history");
       }
     }
@@ -165,6 +179,7 @@ export default function IndexScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      {/* Top Bar */}
       <View style={styles.topBar}>
         <View style={styles.leftInfo}>
           <Ionicons name="mic-outline" size={18} color="#2D7CF6" />
@@ -182,12 +197,13 @@ export default function IndexScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Text Area */}
       <View style={styles.textArea}>
         <ScrollView
           ref={scrollRef}
           style={styles.textScroll}
           contentContainerStyle={styles.textScrollContent}
-          showsVerticalScrollIndicator={true}
+          showsVerticalScrollIndicator
         >
           {liveText ? (
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -212,59 +228,23 @@ export default function IndexScreen() {
             </View>
           )}
         </ScrollView>
-
-        <View style={styles.langBadge}>
-          <Ionicons name="globe-outline" size={12} color="#2D7CF6" />
-          <Text style={styles.langBadgeText}>{language}</Text>
-        </View>
       </View>
 
       <View style={styles.controls} />
 
-      <Modal visible={showParams} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalSheet}>
-            <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>პარამეტრები</Text>
-            <Text style={styles.modalLabel}>ენა</Text>
-            <View style={styles.langGrid}>
-              {["ქართული", "English", "Русский", "Deutsch", "Français"].map(
-                (lang) => (
-                  <TouchableOpacity
-                    key={lang}
-                    style={[
-                      styles.langChip,
-                      language === lang && styles.langChipActive,
-                    ]}
-                    onPress={() => setLanguage(lang)}
-                  >
-                    <Text
-                      style={[
-                        styles.langChipText,
-                        language === lang && styles.langChipTextActive,
-                      ]}
-                    >
-                      {lang}
-                    </Text>
-                  </TouchableOpacity>
-                ),
-              )}
-            </View>
-            <TouchableOpacity
-              style={styles.modalClose}
-              onPress={() => setShowParams(false)}
-            >
-              <Text style={styles.modalCloseText}>შენახვა</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      {/* Settings Modal — ცალკე კომპონენტი */}
+      <SettingsModal
+        visible={showParams}
+        initialValues={settings}
+        onClose={() => setShowParams(false)}
+        onSave={(newSettings) => setSettings(newSettings)}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#F7F9FF" },
+  safe: { flex: 1, backgroundColor: "#FFFFFF" },
   topBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -287,8 +267,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    borderWidth: 1,
-    borderColor: "#2D7CF6",
+    borderWidth: 1.2,
+    borderColor: "#86b4fa",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -305,8 +285,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#D8E8FF",
+    borderWidth: 1.2,
+    borderColor: "#f0f0f0",
     overflow: "hidden",
   },
   textScroll: { flex: 1 },
@@ -363,62 +343,4 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     paddingTop: 6,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  modalSheet: {
-    backgroundColor: "#FFF",
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: 24,
-    paddingBottom: 40,
-  },
-  modalHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "#E0E0EC",
-    alignSelf: "center",
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#1A1A2E",
-    marginBottom: 20,
-  },
-  modalLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#9090A8",
-    marginBottom: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-  },
-  langGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: 28,
-  },
-  langChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 10,
-    backgroundColor: "#F4F4FB",
-    borderWidth: 1.5,
-    borderColor: "#E8E8F0",
-  },
-  langChipActive: { backgroundColor: "#2D7CF6", borderColor: "#2D7CF6" },
-  langChipText: { fontSize: 14, fontWeight: "600", color: "#444" },
-  langChipTextActive: { color: "#FFF" },
-  modalClose: {
-    backgroundColor: "#2D7CF6",
-    borderRadius: 14,
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  modalCloseText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
 });
