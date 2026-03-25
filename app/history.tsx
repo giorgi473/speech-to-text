@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,8 +8,13 @@ import {
   TouchableWithoutFeedback,
   View,
   ScrollView,
+  Animated,
 } from "react-native";
-import { useRecords } from "./RecordContext";
+import {
+  Swipeable,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
+import { useRecords, RecordItem } from "./RecordContext";
 
 const LANGUAGES = [
   { code: "ka", label: "ქართული", flag: "🇬🇪" },
@@ -77,8 +82,7 @@ function UserProfileRow() {
                     index === 0 && styles.dropdownItemFirst,
                     index === LANGUAGES.length - 1 && styles.dropdownItemLast,
                     index < LANGUAGES.length - 1 && styles.dropdownItemBorder,
-                    selectedLang.code === lang.code &&
-                      styles.dropdownItemActive,
+                    selectedLang.code === lang.code && styles.dropdownItemActive,
                   ]}
                   onPress={() => handleSelect(lang)}
                   activeOpacity={0.7}
@@ -88,7 +92,7 @@ function UserProfileRow() {
                     style={[
                       styles.dropdownLabel,
                       selectedLang.code === lang.code &&
-                        styles.dropdownLabelActive,
+                      styles.dropdownLabelActive,
                     ]}
                   >
                     {lang.label}
@@ -106,41 +110,170 @@ function UserProfileRow() {
   );
 }
 
-export default function HistoryScreen() {
-  const { records } = useRecords();
+function SwipeableCard({
+  record,
+  onDelete,
+}: {
+  record: RecordItem;
+  onDelete: (id: number) => void;
+}) {
+  const swipeableRef = useRef<Swipeable>(null);
+  const deleteAnim = useRef(new Animated.Value(1)).current;
+  const [expanded, setExpanded] = useState(false);
+
+  const handleDelete = () => {
+    swipeableRef.current?.close();
+    Animated.timing(deleteAnim, {
+      toValue: 0,
+      duration: 280,
+      useNativeDriver: true,
+    }).start(() => onDelete(record.id));
+  };
+
+  const renderRightActions = (
+    progress: Animated.AnimatedInterpolation<number>
+  ) => {
+    const translateX = progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [40, 0],
+    });
+    const opacity = progress.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [0, 0.5, 1],
+    });
+    const scale = progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.85, 1],
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.deleteAction,
+          { opacity, transform: [{ translateX }, { scale }] },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={handleDelete}
+          activeOpacity={0.7}
+          style={styles.deleteIconBtn}
+        >
+          <Ionicons name="trash-outline" size={22} color="#FF3B30" />
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
+
+  const toggleExpand = () => {
+    setExpanded((prev) => !prev);
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={26} color="#333" />
-        </TouchableOpacity>
-        <UserProfileRow />
-      </View>
+    <Animated.View
+      style={{
+        opacity: deleteAnim,
+        transform: [{ scaleY: deleteAnim }],
+      }}
+    >
+      <Swipeable
+        ref={swipeableRef}
+        renderRightActions={renderRightActions}
+        rightThreshold={40}
+        overshootRight={false}
+        friction={2}
+        containerStyle={styles.swipeableContainer}
+      >
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Ionicons
+              name="mic-outline"
+              size={13}
+              color="#bbb"
+              style={{ marginRight: 5 }}
+            />
+            <Text style={styles.recordMeta}>
+              {record.date} · {record.duration}
+            </Text>
+          </View>
+          <View style={styles.cardMainWrapper}>
+            <TouchableOpacity
+              style={styles.editIconAbsolute}
+              onPress={toggleExpand}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="create-outline"
+                size={18}
+                color={expanded ? "#2D7CF6" : "#777"}
+              />
+            </TouchableOpacity>
 
-      <View style={styles.textWrapper}>
-        <ScrollView
-          style={styles.textScroll}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={true}
-        >
-          {records.length === 0 ? (
-            <Text style={styles.emptyText}>ჩანაწერები ჯერ არ არის</Text>
-          ) : (
-            records.map((r) => (
-              <View key={r.id} style={styles.card}>
-                <Text style={styles.recordMeta}>
-                  {r.date} · {r.duration}
-                </Text>
-                <Text style={styles.mainText}>{r.text}</Text>
-              </View>
-            ))
-          )}
-        </ScrollView>
-      </View>
-    </View>
+            <Text
+              style={styles.mainTextIndented}
+              numberOfLines={expanded ? undefined : 2}
+              ellipsizeMode="tail"
+            >
+              {record.text}
+            </Text>
+          </View>
+        </View>
+      </Swipeable>
+    </Animated.View>
   );
 }
+
+export default function HistoryScreen() {
+  const { records, deleteRecord } = useRecords();
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backBtn}
+          >
+            <Ionicons name="chevron-back" size={26} color="#333" />
+          </TouchableOpacity>
+          <UserProfileRow />
+        </View>
+
+        <View style={styles.textWrapper}>
+          <ScrollView
+            style={styles.textScroll}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {records.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="mic-off-outline" size={42} color="#ddd" />
+                <Text style={styles.emptyText}>ჩანაწერები ჯერ არ არის</Text>
+                <Text style={styles.emptySubText}>
+                  პირველი ჩანაწერი გამოჩნდება აქ
+                </Text>
+              </View>
+            ) : (
+              <>
+                <Text style={styles.swipeHint}>
+                  ← მარჯვნიდან გადაწიეთ წასაშლელად
+                </Text>
+                {records.map((r) => (
+                  <SwipeableCard
+                    key={r.id}
+                    record={r}
+                    onDelete={deleteRecord}
+                  />
+                ))}
+              </>
+            )}
+          </ScrollView>
+        </View>
+      </View>
+    </GestureHandlerRootView>
+  );
+}
+
+const ICON_BLOCK_WIDTH = 26;
 
 const styles = StyleSheet.create({
   container: {
@@ -283,39 +416,93 @@ const styles = StyleSheet.create({
     color: "#5086d7",
     fontWeight: "600",
   },
-
   textWrapper: {
     flex: 1,
-    padding: 16,
+    paddingTop: 12,
+    paddingHorizontal: 16,
   },
   textScroll: {
     flex: 1,
   },
-  // აქ ვაკეთებთ ლისტის padding-ს და gap-ს
   listContent: {
-    paddingBottom: 24,
-    gap: 12,
+    paddingBottom: 32,
+    gap: 10,
   },
-  // თითო ჩანაწერის ქარდი
+  swipeHint: {
+    fontSize: 11,
+    color: "#bbb",
+    textAlign: "center",
+    marginBottom: 4,
+    letterSpacing: 0.2,
+  },
+  swipeableContainer: {
+    borderRadius: 12,
+    overflow: "hidden",
+  },
   card: {
     padding: 16,
     backgroundColor: "#FFFFFF",
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#e0e8ff",
+    borderColor: "#e8eeff",
+    shadowColor: "#6fa3ef",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
   },
   recordMeta: {
     fontSize: 11,
-    color: "#888",
-    marginBottom: 4,
+    color: "#aaa",
   },
-  mainText: {
+
+  cardMainWrapper: {
+    position: "relative",
+    paddingLeft: ICON_BLOCK_WIDTH,
+    minHeight: 22,
+  },
+  editIconAbsolute: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    paddingHorizontal: 2,
+    paddingVertical: 2,
+  },
+  mainTextIndented: {
     fontSize: 15,
     color: "#333",
     lineHeight: 22,
   },
+
+  deleteAction: {
+    justifyContent: "center",
+    alignItems: "flex-end",
+    marginLeft: 8,
+  },
+  deleteIconBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 80,
+    gap: 8,
+  },
   emptyText: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#999",
+    fontWeight: "600",
+    marginTop: 8,
+  },
+  emptySubText: {
+    fontSize: 12,
+    color: "#bbb",
   },
 });
