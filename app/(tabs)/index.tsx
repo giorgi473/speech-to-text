@@ -4,7 +4,6 @@ import {
   Animated,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -12,7 +11,7 @@ import {
 import { useRecording } from "./_layout";
 import { router } from "expo-router";
 import { useRecords } from "../RecordContext";
-import SettingsModal, { SettingsValues } from "../../components/SettingsModal";
+import SettingsModal, { SettingsValues } from "@/components/settings";
 
 const LIVE_CHUNKS = [
   "ტექნოლოგიები ყოველდღიურად იცვლება ",
@@ -44,7 +43,6 @@ const LIVE_CHUNKS = [
   "ამ რევოლუციურ ტექნოლოგიას. ",
 ];
 
-// ენის label-ების მაპი badge-სთვის
 const LANGUAGE_LABELS: Record<string, string> = {
   ka: "ქართული",
   en: "English",
@@ -77,7 +75,6 @@ export default function IndexScreen() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scrollRef = useRef<ScrollView>(null);
 
-  // Cursor blink
   useEffect(() => {
     const blink = Animated.loop(
       Animated.sequence([
@@ -174,53 +171,59 @@ export default function IndexScreen() {
       if (chunkTimerRef.current) clearInterval(chunkTimerRef.current);
       if (timerRef.current) clearInterval(timerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRecording]);
 
   return (
-    <SafeAreaView style={styles.safe}>
-      {/* Top Bar */}
-      <View style={styles.topBar}>
-        <View style={styles.leftInfo}>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-row items-center justify-between px-4 pt-3 pb-2">
+        <View className="flex-row items-center">
           <Ionicons name="mic-outline" size={18} color="#2D7CF6" />
-          <Text style={styles.leftInfoText}>
+          <Text className="ml-1.5 text-[14px] font-semibold text-[#1A1A2E]">
             {isRecording ? "ჩანაწერი მიდის..." : "დაიწყე ჩანაწერა..."}
           </Text>
         </View>
-
         <TouchableOpacity
-          style={styles.settingsOutlineBtn}
+          className="flex-row items-center rounded-md border border-[#86b4fa] bg-white px-3 py-1.5"
           onPress={() => setShowParams(true)}
         >
           <Ionicons name="settings-outline" size={16} color="#2D7CF6" />
-          <Text style={styles.settingsOutlineText}>პარამეტრები</Text>
+          <Text className="ml-1 text-[13px] font-semibold text-[#2D7CF6]">
+            პარამეტრები
+          </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Text Area */}
-      <View style={styles.textArea}>
+      <View className="mx-4 mb-3 flex-1 overflow-hidden rounded-xl border border-[#f0f0f0] bg-white">
         <ScrollView
           ref={scrollRef}
-          style={styles.textScroll}
-          contentContainerStyle={styles.textScrollContent}
+          className="flex-1"
+          contentContainerStyle={{ padding: 18, flexGrow: 1 }}
           showsVerticalScrollIndicator
         >
           {liveText ? (
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-              <Text style={styles.liveText}>{liveText}</Text>
+            <View className="flex-row flex-wrap">
+              <Text className="text-[16px] font-normal leading-[26px] text-[#1A1A2E]">
+                {liveText}
+              </Text>
               {isRecording && (
                 <Animated.View
-                  style={[styles.cursor, { opacity: cursorAnim }]}
+                  style={{
+                    opacity: cursorAnim,
+                    width: 2,
+                    height: 20,
+                    marginTop: 3,
+                    borderRadius: 1,
+                    backgroundColor: "#2D7CF6",
+                  }}
                 />
               )}
             </View>
           ) : (
-            <View style={styles.placeholderContainer}>
+            <View className="flex-1 items-center justify-center pt-16">
               <Ionicons name="mic-outline" size={44} color="#C5D5F5" />
-              <Text style={styles.placeholderTitle}>
+              <Text className="mt-3.5 text-[17px] font-bold text-[#1A1A2E]">
                 {isRecording ? "მოსმენა..." : "ჩაიწერეთ ხმა"}
               </Text>
-              <Text style={styles.placeholderSub}>
+              <Text className="mt-1.5 max-w-[220px] text-center text-[13px] leading-5 text-[#9090A8]">
                 {isRecording
                   ? "ლაპარაკი გრძელდება, ტექსტი გამოჩნდება..."
                   : "დააჭირეთ ქვემოთ მიკროფონს"}
@@ -230,9 +233,9 @@ export default function IndexScreen() {
         </ScrollView>
       </View>
 
-      <View style={styles.controls} />
-
-      {/* Settings Modal — ცალკე კომპონენტი */}
+      <View className="items-center pt-1.5 pb-8">
+        {/* აქ დაამატებ მიკrofონის ბಟონს / სხვა კონტროლებს */}
+      </View>
       <SettingsModal
         visible={showParams}
         initialValues={settings}
@@ -242,105 +245,3 @@ export default function IndexScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#FFFFFF" },
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  leftInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  leftInfoText: {
-    fontSize: 14,
-    color: "#1A1A2E",
-    fontWeight: "600",
-  },
-  settingsOutlineBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    borderWidth: 1.2,
-    borderColor: "#86b4fa",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: "#FFFFFF",
-  },
-  settingsOutlineText: {
-    color: "#2D7CF6",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  textArea: {
-    flex: 1,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    borderWidth: 1.2,
-    borderColor: "#f0f0f0",
-    overflow: "hidden",
-  },
-  textScroll: { flex: 1 },
-  textScrollContent: { padding: 18, flexGrow: 1 },
-  liveText: {
-    fontSize: 16,
-    color: "#1A1A2E",
-    lineHeight: 26,
-    fontWeight: "400",
-    letterSpacing: 0.2,
-  },
-  cursor: {
-    width: 2,
-    height: 20,
-    backgroundColor: "#2D7CF6",
-    marginTop: 3,
-    borderRadius: 1,
-  },
-  placeholderContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 60,
-  },
-  placeholderTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#1A1A2E",
-    marginTop: 14,
-  },
-  placeholderSub: {
-    fontSize: 13,
-    color: "#9090A8",
-    marginTop: 6,
-    textAlign: "center",
-    lineHeight: 20,
-    maxWidth: 220,
-  },
-  langBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    position: "absolute",
-    bottom: 10,
-    right: 12,
-    backgroundColor: "#EEF4FF",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-  langBadgeText: { fontSize: 11, color: "#2D7CF6", fontWeight: "600" },
-  controls: {
-    alignItems: "center",
-    paddingBottom: 30,
-    paddingTop: 6,
-  },
-});

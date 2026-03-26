@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import "../global.css";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import { RecordProvider } from "./RecordContext";
@@ -30,3 +31,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+

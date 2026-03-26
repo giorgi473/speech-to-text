@@ -1,10 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Alert,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -56,69 +55,79 @@ export default function AudioFileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.uploadZone}>
+    <SafeAreaView className="flex-1 bg-white">
+      {/* Upload Zone */}
+      <View className="p-5">
         <TouchableOpacity
-          style={styles.uploadBtn}
+          className="bg-white rounded-[20px] border-2 border-dashed border-[#D8E8FF] items-center py-8 gap-2"
           onPress={handleUpload}
           activeOpacity={0.85}
         >
-          <View style={styles.uploadIconWrap}>
+          <View className="w-16 h-16 rounded-full bg-[#EEF4FF] items-center justify-center">
             <Ionicons name="cloud-upload-outline" size={36} color="#2D7CF6" />
           </View>
-          <Text style={styles.uploadTitle}>ფაილის ატვირთვა</Text>
-          <Text style={styles.uploadSub}>
+          <Text className="text-base font-bold text-[#1A1A2E]">
+            ფაილის ატვირთვა
+          </Text>
+          <Text className="text-[13px] text-[#9090A8]">
             MP3 · WAV · M4A · OGG · მაქს. 200MB
           </Text>
         </TouchableOpacity>
       </View>
 
+      {/* File List */}
       <ScrollView
-        style={styles.list}
-        contentContainerStyle={{ padding: 16, gap: 12 }}
+        className="flex-1"
+        contentContainerClassName="p-4 gap-3"
         showsVerticalScrollIndicator={false}
       >
         {files.length === 0 ? (
-          <View style={styles.emptyState}>
+          <View className="items-center pt-16 gap-3">
             <Ionicons name="document-outline" size={48} color="#D0D8F0" />
-            <Text style={styles.emptyText}>ჯერ ფაილი არ არის ატვირთული</Text>
+            <Text className="text-[15px] text-[#B0B0C8] font-medium">
+              ჯერ ფაილი არ არის ატვირთული
+            </Text>
           </View>
         ) : (
           files.map((file) => (
-            <View key={file.id} style={styles.fileCard}>
-              <View style={styles.fileIconWrap}>
+            <View
+              key={file.id}
+              className="bg-white rounded-2xl p-[14px] flex-row items-center gap-3 mb-3"
+            >
+              <View className="w-11 h-11 rounded-xl bg-[#EEF4FF] items-center justify-center">
                 <Ionicons name="musical-notes" size={22} color="#2D7CF6" />
               </View>
-              <View style={styles.fileInfo}>
-                <Text style={styles.fileName} numberOfLines={1}>
+
+              <View className="flex-1 gap-1">
+                <Text
+                  className="text-sm font-bold text-[#1A1A2E]"
+                  numberOfLines={1}
+                >
                   {file.name}
                 </Text>
-                <Text style={styles.fileMeta}>
+                <Text className="text-xs text-[#9090A8]">
                   {file.size} · {file.duration}
                 </Text>
                 <View
-                  style={[
-                    styles.badge,
-                    file.status === "done"
-                      ? styles.badgeDone
-                      : styles.badgeProc,
-                  ]}
+                  className={`self-start px-[10px] py-1 rounded-lg mt-0.5 ${
+                    file.status === "done" ? "bg-[#E8F5E9]" : "bg-[#FFF8E1]"
+                  }`}
                 >
                   <Text
-                    style={[
-                      styles.badgeText,
+                    className={`text-xs font-semibold ${
                       file.status === "done"
-                        ? styles.badgeTextDone
-                        : styles.badgeTextProc,
-                    ]}
+                        ? "text-[#2E7D32]"
+                        : "text-[#F57F17]"
+                    }`}
                   >
                     {file.status === "done" ? "✓ დასრულდა" : "⏳ მუშავდება"}
                   </Text>
                 </View>
               </View>
+
               <TouchableOpacity
                 onPress={() => removeFile(file.id)}
-                style={styles.removeBtn}
+                className="p-1"
               >
                 <Ionicons name="close-circle" size={22} color="#C0C0D0" />
               </TouchableOpacity>
@@ -129,77 +138,3 @@ export default function AudioFileScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: "#FFFFFF",
-  },
-  headerTitle: { fontSize: 17, fontWeight: "700", color: "#1A1A2E" },
-  uploadZone: { padding: 20 },
-  uploadBtn: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: "#D8E8FF",
-    borderStyle: "dashed",
-    alignItems: "center",
-    paddingVertical: 32,
-    gap: 10,
-  },
-  uploadIconWrap: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "#EEF4FF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  uploadTitle: { fontSize: 16, fontWeight: "700", color: "#1A1A2E" },
-  uploadSub: { fontSize: 13, color: "#9090A8" },
-  list: { flex: 1 },
-  emptyState: { alignItems: "center", paddingTop: 60, gap: 12 },
-  emptyText: { fontSize: 15, color: "#B0B0C8", fontWeight: "500" },
-  fileCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 12,
-  },
-  fileIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: "#EEF4FF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  fileInfo: { flex: 1, gap: 4 },
-  fileName: { fontSize: 14, fontWeight: "700", color: "#1A1A2E" },
-  fileMeta: { fontSize: 12, color: "#9090A8" },
-  badge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginTop: 2,
-  },
-  badgeDone: { backgroundColor: "#E8F5E9" },
-  badgeProc: { backgroundColor: "#FFF8E1" },
-  badgeText: { fontSize: 12, fontWeight: "600" },
-  badgeTextDone: { color: "#2E7D32" },
-  badgeTextProc: { color: "#F57F17" },
-  removeBtn: { padding: 4 },
-});
