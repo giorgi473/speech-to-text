@@ -6,7 +6,6 @@ import {
   Linking,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -51,16 +50,19 @@ export default function YouTubeLinkScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      {/* Input Card */}
-      <View style={styles.inputSection}>
-        <Text style={styles.sectionLabel}>YouTube ბმული</Text>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="bg-white mx-4 mt-4 rounded-[20px] p-5 gap-3">
+        <Text className="text-xs font-bold text-[#9090A8] tracking-widest uppercase">
+          YouTube ბმული
+        </Text>
+
         <View
-          style={[
-            styles.inputWrap,
-            url.length > 0 &&
-              (isValid ? styles.inputWrapValid : styles.inputWrapInvalid),
-          ]}
+          className={`flex-row items-center bg-[#F7F8FC] rounded-xl px-[14px] py-3 border-[1.5px] ${url.length === 0
+            ? "border-[#EEEEF5]"
+            : isValid
+              ? "border-green-500"
+              : "border-red-200"
+            }`}
         >
           <Ionicons
             name="link-outline"
@@ -69,7 +71,7 @@ export default function YouTubeLinkScreen() {
             style={{ marginRight: 10 }}
           />
           <TextInput
-            style={styles.input}
+            className="flex-1 text-sm text-[#1A1A2E] font-medium"
             placeholder="https://youtube.com/watch?v=..."
             placeholderTextColor="#C0C0D0"
             value={url}
@@ -79,21 +81,21 @@ export default function YouTubeLinkScreen() {
             keyboardType="url"
           />
           {url.length > 0 && (
-            <TouchableOpacity onPress={() => setUrl("")} style={{ padding: 4 }}>
+            <TouchableOpacity onPress={() => setUrl("")} className="p-1">
               <Ionicons name="close-circle" size={18} color="#C0C0D0" />
             </TouchableOpacity>
           )}
         </View>
 
         {url.length > 0 && !isValid && (
-          <Text style={styles.errorHint}>⚠ სწორი YouTube URL არ არის</Text>
+          <Text className="text-xs text-[#E05555] -mt-1">
+            ⚠ სწორი YouTube URL არ არის
+          </Text>
         )}
 
         <TouchableOpacity
-          style={[
-            styles.processBtn,
-            (!isValid || loading) && styles.processBtnDisabled,
-          ]}
+          className={`rounded-[14px] py-[15px] flex-row items-center justify-center ${!isValid || loading ? "bg-[#D0D0E0]" : "bg-red-600"
+            }`}
           onPress={handleProcess}
           disabled={!isValid || loading}
           activeOpacity={0.8}
@@ -108,49 +110,62 @@ export default function YouTubeLinkScreen() {
                 color="#FFFFFF"
                 style={{ marginRight: 8 }}
               />
-              <Text style={styles.processBtnText}>ტრანსკრიბირება</Text>
+              <Text className="text-white text-[15px] font-bold">
+                ტრანსკრიბირება
+              </Text>
             </>
           )}
         </TouchableOpacity>
       </View>
-
-      {/* Results */}
       <ScrollView
-        style={styles.list}
-        contentContainerStyle={{ padding: 16, gap: 12 }}
+        className="flex-1"
+        contentContainerClassName="p-4 gap-3"
         showsVerticalScrollIndicator={false}
       >
         {transcripts.length === 0 ? (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconWrap}>
+          <View className="items-center pt-10 gap-3 px-5">
+            <View className="w-20 h-20 rounded-full bg-[#FFF5F5] items-center justify-center">
               <Ionicons name="logo-youtube" size={40} color="#FFD5D5" />
             </View>
-            <Text style={styles.emptyTitle}>YouTube ვიდეოს ტრანსკრიბირება</Text>
-            <Text style={styles.emptyText}>
+            <Text className="text-base font-bold text-[#1A1A2E] text-center">
+              YouTube ვიდეოს ტრანსკრიბირება
+            </Text>
+            <Text className="text-sm text-[#9090A8] text-center leading-5">
               ჩასვით ბმული და მიიღეთ ტექსტი ნებისმიერი ვიდეოდან
             </Text>
           </View>
         ) : (
           transcripts.map((item) => (
-            <View key={item.id} style={styles.card}>
-              <View style={styles.cardHeader}>
-                <View style={styles.cardYtBadge}>
+            <View key={item.id} className="bg-white rounded-2xl p-4 gap-2 mb-3">
+              <View className="flex-row items-center gap-2">
+                <View className="w-[26px] h-[26px] rounded-md bg-[#FFF0F0] items-center justify-center">
                   <Ionicons name="logo-youtube" size={16} color="#FF0000" />
                 </View>
-                <Text style={styles.cardTitle} numberOfLines={1}>
+                <Text
+                  className="flex-1 text-sm font-bold text-[#1A1A2E]"
+                  numberOfLines={1}
+                >
                   {item.title}
                 </Text>
-                <Text style={styles.cardTime}>{item.time}</Text>
+                <Text className="text-xs text-[#9090A8]">{item.time}</Text>
               </View>
-              <Text style={styles.cardPreview} numberOfLines={2}>
+
+              <Text
+                className="text-[13px] text-[#606078] leading-[19px]"
+                numberOfLines={2}
+              >
                 {item.preview}
               </Text>
+
               <TouchableOpacity
-                style={styles.openLink}
-                onPress={() => Linking.openURL(item.url).catch(() => {})}
+                className="flex-row items-center"
+                onPress={() => Linking.openURL(item.url).catch(() => { })}
               >
                 <Ionicons name="open-outline" size={14} color="#2D7CF6" />
-                <Text style={styles.openLinkText}> ორიგინალი</Text>
+                <Text className="text-[13px] text-[#2D7CF6] font-semibold">
+                  {" "}
+                  ორიგინალი
+                </Text>
               </TouchableOpacity>
             </View>
           ))
@@ -159,118 +174,3 @@ export default function YouTubeLinkScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: "#FFFFFF",
-  },
-  ytBadge: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    backgroundColor: "#FFF0F0",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: { fontSize: 17, fontWeight: "700", color: "#1A1A2E" },
-  inputSection: {
-    backgroundColor: "#FFFFFF",
-    margin: 16,
-    borderRadius: 20,
-    padding: 20,
-    gap: 12,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#9090A8",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-  },
-  inputWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F7F8FC",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderWidth: 1.5,
-    borderColor: "#EEEEF5",
-  },
-  inputWrapValid: { borderColor: "#4CAF50" },
-  inputWrapInvalid: { borderColor: "#FFCDD2" },
-  input: { flex: 1, fontSize: 14, color: "#1A1A2E", fontWeight: "500" },
-  errorHint: { fontSize: 12, color: "#E05555", marginTop: -4 },
-  processBtn: {
-    backgroundColor: "#FF0000",
-    borderRadius: 14,
-    paddingVertical: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  processBtnDisabled: {
-    backgroundColor: "#D0D0E0",
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  processBtnText: { color: "#FFFFFF", fontSize: 15, fontWeight: "700" },
-  list: { flex: 1 },
-  emptyState: {
-    alignItems: "center",
-    paddingTop: 40,
-    gap: 12,
-    paddingHorizontal: 20,
-  },
-  emptyIconWrap: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#FFF5F5",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#1A1A2E",
-    textAlign: "center",
-  },
-  emptyText: {
-    fontSize: 14,
-    color: "#9090A8",
-    textAlign: "center",
-    lineHeight: 20,
-  },
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
-    gap: 8,
-    marginBottom: 12,
-  },
-  cardHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
-  cardYtBadge: {
-    width: 26,
-    height: 26,
-    borderRadius: 6,
-    backgroundColor: "#FFF0F0",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cardTitle: { flex: 1, fontSize: 14, fontWeight: "700", color: "#1A1A2E" },
-  cardTime: { fontSize: 12, color: "#9090A8" },
-  cardPreview: { fontSize: 13, color: "#606078", lineHeight: 19 },
-  openLink: { flexDirection: "row", alignItems: "center" },
-  openLinkText: { fontSize: 13, color: "#2D7CF6", fontWeight: "600" },
-});

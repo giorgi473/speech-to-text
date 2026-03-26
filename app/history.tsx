@@ -2,12 +2,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  StyleSheet,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  ScrollView,
+  FlatList,
   Animated,
 } from "react-native";
 import {
@@ -16,15 +15,25 @@ import {
 } from "react-native-gesture-handler";
 import { useRecords, RecordItem } from "./RecordContext";
 
+function getInitials(email: string): string {
+  const local = email.split("@")[0];
+  const parts = local.split(/[._\-]/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return local.slice(0, 2).toUpperCase();
+}
+
 const LANGUAGES = [
   { code: "ka", label: "ქართული", flag: "🇬🇪" },
   { code: "en", label: "English", flag: "🇬🇧" },
   { code: "ru", label: "Русский", flag: "🇷🇺" },
 ];
 
-function UserProfileRow() {
+function UserProfileRow({ email }: { email: string }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState(LANGUAGES[0]);
+  const initials = getInitials(email);
 
   const handleSelect = (lang: (typeof LANGUAGES)[0]) => {
     setSelectedLang(lang);
@@ -32,68 +41,89 @@ function UserProfileRow() {
   };
 
   return (
-    <View style={styles.profileRow}>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>G</Text>
+    <View className="flex-1 flex-row items-center ml-1">
+      {/* Avatar */}
+      <View className="w-[38px] h-[38px] rounded-full bg-[#A8E6B0] items-center justify-center mr-[10px]">
+        <Text className="text-base font-bold text-[#2E7D32]">{initials}</Text>
       </View>
-      <View style={styles.profileInfo}>
-        <Text style={styles.profileEmail}>giorgi.kavtaradze@gmail.com</Text>
-        <View style={styles.badgeWrapper}>
-          <View style={styles.premiumBadge}>
-            <Text style={styles.premiumText}>პრემიუმი</Text>
+
+      {/* Profile Info */}
+      <View className="flex-1">
+        <Text className="text-[13px] font-semibold text-[#111]">{email}</Text>
+        <View className="self-start mt-[3px]">
+          <View className="bg-[#E8F5E9] rounded-md px-2 py-0.5">
+            <Text className="text-[11px] font-semibold text-[#2E7D32]">
+              პრემიუმი
+            </Text>
           </View>
           <Ionicons
             name="star"
             size={12}
             color="#F9A825"
-            style={styles.starIcon}
+            style={{ position: "absolute", top: -6, right: -6 }}
           />
         </View>
       </View>
 
+      {/* Language Selector */}
       <View>
         <TouchableOpacity
-          style={styles.langBtn}
+          className="flex-row items-center pr-2 pl-1"
           onPress={() => setDropdownOpen((v) => !v)}
           activeOpacity={0.7}
         >
-          <Text style={styles.flagEmoji}>{selectedLang.flag}</Text>
+          <Text className="text-2xl">{selectedLang.flag}</Text>
           <Ionicons
             name={dropdownOpen ? "chevron-up" : "chevron-down"}
             size={14}
             color="#555"
-            style={styles.chevron}
+            style={{ marginLeft: 3, marginTop: 1 }}
           />
         </TouchableOpacity>
 
         {dropdownOpen && (
           <>
             <TouchableWithoutFeedback onPress={() => setDropdownOpen(false)}>
-              <View style={styles.backdrop} />
+              <View
+                style={{
+                  position: "absolute",
+                  top: -200,
+                  left: -400,
+                  right: -400,
+                  bottom: -1000,
+                  zIndex: 200,
+                }}
+              />
             </TouchableWithoutFeedback>
 
-            <View style={styles.dropdown}>
+            <View
+              style={{
+                position: "absolute",
+                top: 36,
+                right: 0,
+                zIndex: 300,
+                minWidth: 160,
+              }}
+              className="bg-white rounded-xl border border-[#e0e8ff] shadow-md overflow-hidden"
+            >
               {LANGUAGES.map((lang, index) => (
                 <TouchableOpacity
                   key={lang.code}
-                  style={[
-                    styles.dropdownItem,
-                    index === 0 && styles.dropdownItemFirst,
-                    index === LANGUAGES.length - 1 && styles.dropdownItemLast,
-                    index < LANGUAGES.length - 1 && styles.dropdownItemBorder,
-                    selectedLang.code === lang.code &&
-                      styles.dropdownItemActive,
-                  ]}
+                  className={`flex-row items-center px-[14px] py-[11px] ${
+                    index < LANGUAGES.length - 1
+                      ? "border-b border-b-[#eee]"
+                      : ""
+                  } ${selectedLang.code === lang.code ? "bg-[#F0F6FF]" : ""}`}
                   onPress={() => handleSelect(lang)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.dropdownFlag}>{lang.flag}</Text>
+                  <Text className="text-lg mr-[10px]">{lang.flag}</Text>
                   <Text
-                    style={[
-                      styles.dropdownLabel,
-                      selectedLang.code === lang.code &&
-                        styles.dropdownLabelActive,
-                    ]}
+                    className={`flex-1 text-sm font-medium ${
+                      selectedLang.code === lang.code
+                        ? "text-[#5086d7] font-semibold"
+                        : "text-[#333]"
+                    }`}
                   >
                     {lang.label}
                   </Text>
@@ -148,24 +178,23 @@ function SwipeableCard({
 
     return (
       <Animated.View
-        style={[
-          styles.deleteAction,
-          { opacity, transform: [{ translateX }, { scale }] },
-        ]}
+        style={{
+          opacity,
+          transform: [{ translateX }, { scale }],
+          justifyContent: "center",
+          alignItems: "flex-end",
+          marginLeft: 8,
+        }}
       >
         <TouchableOpacity
           onPress={handleDelete}
           activeOpacity={0.7}
-          style={styles.deleteIconBtn}
+          className="px-[10px] py-[10px]"
         >
           <Ionicons name="trash-outline" size={22} color="#FF3B30" />
         </TouchableOpacity>
       </Animated.View>
     );
-  };
-
-  const toggleExpand = () => {
-    setExpanded((prev) => !prev);
   };
 
   return (
@@ -181,24 +210,27 @@ function SwipeableCard({
         rightThreshold={40}
         overshootRight={false}
         friction={2}
-        containerStyle={styles.swipeableContainer}
+        containerStyle={{ borderRadius: 12, overflow: "hidden" }}
       >
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
+        <View className="p-4 bg-white rounded-xl border border-[#e8eeff]">
+          {/* Card Header */}
+          <View className="flex-row items-center mb-[6px]">
             <Ionicons
               name="mic-outline"
               size={13}
               color="#bbb"
               style={{ marginRight: 5 }}
             />
-            <Text style={styles.recordMeta}>
+            <Text className="text-[11px] text-[#aaa]">
               {record.date} · {record.duration}
             </Text>
           </View>
-          <View style={styles.cardMainWrapper}>
+
+          {/* Card Body */}
+          <View className="relative pl-[26px] min-h-[22px]">
             <TouchableOpacity
-              style={styles.editIconAbsolute}
-              onPress={toggleExpand}
+              className="absolute left-0 top-0 px-0.5 py-0.5"
+              onPress={() => setExpanded((prev) => !prev)}
               activeOpacity={0.7}
             >
               <Ionicons
@@ -209,7 +241,7 @@ function SwipeableCard({
             </TouchableOpacity>
 
             <Text
-              style={styles.mainTextIndented}
+              className="text-[15px] text-[#333] leading-[22px]"
               numberOfLines={expanded ? undefined : 2}
               ellipsizeMode="tail"
             >
@@ -226,283 +258,51 @@ export default function HistoryScreen() {
   const { records, deleteRecord } = useRecords();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backBtn}
-          >
+    <GestureHandlerRootView className="flex-1">
+      <View className="flex-1 bg-[#F5F5F5]">
+        {/* Header */}
+        <View
+          className="flex-row items-center px-2 pt-[42px] pb-[14px] bg-white border-b border-b-[#e7e5e5] z-[100] overflow-visible"
+          style={{ borderBottomWidth: 0.5 }}
+        >
+          <TouchableOpacity onPress={() => router.back()} className="p-2">
             <Ionicons name="chevron-back" size={26} color="#333" />
           </TouchableOpacity>
-          <UserProfileRow />
+          <UserProfileRow email="giorgi.kavtaradze@gmail.com" />
         </View>
 
-        <View style={styles.textWrapper}>
-          <ScrollView
-            style={styles.textScroll}
-            contentContainerStyle={styles.listContent}
+        {/* Content */}
+        <View className="flex-1 pt-3 px-4">
+          <FlatList
+            className="flex-1"
+            contentContainerClassName="pb-8 gap-[10px]"
             showsVerticalScrollIndicator={false}
-          >
-            {records.length === 0 ? (
-              <View style={styles.emptyState}>
+            data={records}
+            keyExtractor={(item) => item.id.toString()}
+            ListEmptyComponent={
+              <View className="items-center justify-center pt-20 gap-2">
                 <Ionicons name="mic-off-outline" size={42} color="#ddd" />
-                <Text style={styles.emptyText}>ჩანაწერები ჯერ არ არის</Text>
-                <Text style={styles.emptySubText}>
+                <Text className="text-[15px] text-[#999] font-semibold mt-2">
+                  ჩანაწერები ჯერ არ არის
+                </Text>
+                <Text className="text-xs text-[#bbb]">
                   პირველი ჩანაწერი გამოჩნდება აქ
                 </Text>
               </View>
-            ) : (
-              <>
-                <Text style={styles.swipeHint}>
+            }
+            ListHeaderComponent={
+              records.length > 0 ? (
+                <Text className="text-[11px] text-[#bbb] text-center mb-1 tracking-wide">
                   ← მარჯვნიდან გადაწიეთ წასაშლელად
                 </Text>
-                {records.map((r) => (
-                  <SwipeableCard
-                    key={r.id}
-                    record={r}
-                    onDelete={deleteRecord}
-                  />
-                ))}
-              </>
+              ) : null
+            }
+            renderItem={({ item }) => (
+              <SwipeableCard record={item} onDelete={deleteRecord} />
             )}
-          </ScrollView>
+          />
         </View>
       </View>
     </GestureHandlerRootView>
   );
 }
-
-const ICON_BLOCK_WIDTH = 26;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 8,
-    paddingTop: 42,
-    paddingBottom: 14,
-    backgroundColor: "#fff",
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#e7e5e5",
-    zIndex: 100,
-    overflow: "visible",
-  },
-  backBtn: {
-    padding: 8,
-  },
-  profileRow: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: 4,
-  },
-  avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: "#A8E6B0",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-  avatarText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#2E7D32",
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  profileEmail: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#111",
-  },
-  badgeWrapper: {
-    alignSelf: "flex-start",
-    marginTop: 3,
-  },
-  premiumBadge: {
-    backgroundColor: "#E8F5E9",
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  premiumText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#2E7D32",
-  },
-  starIcon: {
-    position: "absolute",
-    top: -6,
-    right: -6,
-  },
-  langBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingRight: 8,
-    paddingLeft: 4,
-  },
-  flagEmoji: {
-    fontSize: 24,
-  },
-  chevron: {
-    marginLeft: 3,
-    marginTop: 1,
-  },
-  backdrop: {
-    position: "absolute",
-    top: -200,
-    left: -400,
-    right: -400,
-    bottom: -1000,
-    zIndex: 200,
-  },
-  dropdown: {
-    position: "absolute",
-    top: 36,
-    right: 0,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#e0e8ff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 8,
-    minWidth: 160,
-    zIndex: 300,
-    overflow: "hidden",
-  },
-  dropdownItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-  },
-  dropdownItemFirst: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  dropdownItemLast: {
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  dropdownItemBorder: {
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#eee",
-  },
-  dropdownItemActive: {
-    backgroundColor: "#F0F6FF",
-  },
-  dropdownFlag: {
-    fontSize: 18,
-    marginRight: 10,
-  },
-  dropdownLabel: {
-    flex: 1,
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "500",
-  },
-  dropdownLabelActive: {
-    color: "#5086d7",
-    fontWeight: "600",
-  },
-  textWrapper: {
-    flex: 1,
-    paddingTop: 12,
-    paddingHorizontal: 16,
-  },
-  textScroll: {
-    flex: 1,
-  },
-  listContent: {
-    paddingBottom: 32,
-    gap: 10,
-  },
-  swipeHint: {
-    fontSize: 11,
-    color: "#bbb",
-    textAlign: "center",
-    marginBottom: 4,
-    letterSpacing: 0.2,
-  },
-  swipeableContainer: {
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  card: {
-    padding: 16,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#e8eeff",
-    shadowColor: "#6fa3ef",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  recordMeta: {
-    fontSize: 11,
-    color: "#aaa",
-  },
-
-  cardMainWrapper: {
-    position: "relative",
-    paddingLeft: ICON_BLOCK_WIDTH,
-    minHeight: 22,
-  },
-  editIconAbsolute: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    paddingHorizontal: 2,
-    paddingVertical: 2,
-  },
-  mainTextIndented: {
-    fontSize: 15,
-    color: "#333",
-    lineHeight: 22,
-  },
-
-  deleteAction: {
-    justifyContent: "center",
-    alignItems: "flex-end",
-    marginLeft: 8,
-  },
-  deleteIconBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-  },
-
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 80,
-    gap: 8,
-  },
-  emptyText: {
-    fontSize: 15,
-    color: "#999",
-    fontWeight: "600",
-    marginTop: 8,
-  },
-  emptySubText: {
-    fontSize: 12,
-    color: "#bbb",
-  },
-});

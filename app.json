@@ -33,6 +33,7 @@
       "package": "com.anonymous.speechtotext"
     },
     "web": {
+      "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
