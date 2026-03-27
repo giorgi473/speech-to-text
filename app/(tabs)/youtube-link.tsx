@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -52,8 +51,8 @@ export default function YouTubeLinkScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="bg-white rounded-[20px] p-5 gap-3">
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+      <View className="bg-white rounded-[20px] p-5 pt-0 gap-3" style={{ marginTop: -11 }}>
         <Text className="text-xs font-bold text-[#9090A8] tracking-widest uppercase">
           YouTube ბმული
         </Text>
@@ -173,6 +172,6 @@ export default function YouTubeLinkScreen() {
           ))
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

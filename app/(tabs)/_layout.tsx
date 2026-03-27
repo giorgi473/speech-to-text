@@ -1,6 +1,8 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { router, Tabs } from "expo-router";
 import { createContext, useContext, useRef, useState } from "react";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { MusicNoteSquare02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react-native";
+import { router, Tabs } from "expo-router";
 import { Animated, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -10,12 +12,18 @@ function TabBarIcon({
   name,
   color,
   size,
+  hugeIcon,
 }: {
-  name: IoniconsName;
+  name?: IoniconsName;
   color: string;
   size: number;
+  hugeIcon?: any;
 }) {
-  return <Ionicons name={name} size={size} color={color} />;
+  return hugeIcon ? (
+    <HugeiconsIcon icon={hugeIcon} size={size} color={color} />
+  ) : (
+    name && <Ionicons name={name} size={size} color={color} />
+  );
 }
 
 const RecordingContext = createContext<{
@@ -217,9 +225,9 @@ export default function TabLayout() {
           headerShadowVisible: false,
           tabBarActiveTintColor: "#2D7CF6",
           tabBarItemStyle: {
-            height: 65,
-            justifyContent: 'flex-start',
-            paddingTop: 0,
+            height: 55,
+            justifyContent: 'center',
+            alignItems: 'center',
           },
           tabBarLabelStyle: { fontSize: 11, fontWeight: "600", marginTop: 2 },
           headerRight: () => <BurgerButton />,
@@ -229,11 +237,11 @@ export default function TabLayout() {
           name="audio-file"
           options={{
             title: "აუდიო ფაილი",
-            tabBarIcon: ({ color }) => (
+            tabBarIcon: ({ focused }) => (
               <TabBarIcon
-                name="document-text-outline"
-                color={color}
-                size={26}
+                hugeIcon={MusicNoteSquare02Icon}
+                color={focused ? "#2D7CF6" : "#9090A8"}
+                size={28}
               />
             ),
           }}
@@ -249,8 +257,12 @@ export default function TabLayout() {
           name="youtube-link"
           options={{
             title: "YouTube Link",
-            tabBarIcon: () => (
-              <TabBarIcon name="logo-youtube" color="#FF0000" size={30} />
+            tabBarIcon: ({ focused }) => (
+              <TabBarIcon
+                name="logo-youtube"
+                color={focused ? "#FF0000" : "#9090A8"}
+                size={28}
+              />
             ),
           }}
         />

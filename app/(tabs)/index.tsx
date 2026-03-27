@@ -4,7 +4,6 @@ import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
-  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -176,8 +175,8 @@ export default function IndexScreen() {
   }, [isRecording]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-      <View className="flex-row items-center justify-between px-4 pt-3 pb-2">
+    <View style={{ flex: 1, backgroundColor: 'white', paddingTop: insets.top }}>
+      <View className="flex-row items-center justify-between px-4 pt-0 pb-2" style={{ marginTop: -12 }}>
         <View className="flex-row items-center">
           <Ionicons name="mic-outline" size={18} color="#2D7CF6" />
           <Text className="ml-1.5 text-[14px] font-semibold text-[#1A1A2E]">
@@ -246,6 +245,6 @@ export default function IndexScreen() {
         onClose={() => setShowParams(false)}
         onSave={(newSettings) => setSettings(newSettings)}
       />
-    </SafeAreaView>
+    </View>
   );
 }
