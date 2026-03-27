@@ -1,16 +1,16 @@
-import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import {
   ActivityIndicator,
-  Alert,
   Linking,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CustomAlert from "@/components/CustomAlert";
 
 type TranscriptItem = {
   id: number;
@@ -24,13 +24,22 @@ export default function YouTubeLinkScreen() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptItem[]>([]);
+  const [alert, setAlert] = useState<{ visible: boolean; title: string; message: string }>({
+    visible: false,
+    title: "",
+    message: "",
+  });
   const insets = useSafeAreaInsets();
 
   const isValid = url.includes("youtube.com") || url.includes("youtu.be");
 
   const handleProcess = () => {
     if (!isValid) {
-      Alert.alert("არასწორი URL", "გთხოვთ შეიყვანოთ სწორი YouTube ბმული");
+      setAlert({
+        visible: true,
+        title: "არასწორი URL",
+        message: "გთხოვთ შეიყვანოთ სწორი YouTube ბმული",
+      });
       return;
     }
     setLoading(true);
@@ -52,6 +61,12 @@ export default function YouTubeLinkScreen() {
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+      <CustomAlert
+        visible={alert.visible}
+        title={alert.title}
+        message={alert.message}
+        onClose={() => setAlert({ ...alert, visible: false })}
+      />
       <View className="bg-white rounded-[20px] p-5 pt-0 gap-3" style={{ marginTop: -11 }}>
         <Text className="text-xs font-bold text-[#9090A8] tracking-widest uppercase">
           YouTube ბმული
