@@ -109,21 +109,19 @@ function UserProfileRow({ email }: { email: string }) {
               {LANGUAGES.map((lang, index) => (
                 <TouchableOpacity
                   key={lang.code}
-                  className={`flex-row items-center px-[14px] py-[11px] ${
-                    index < LANGUAGES.length - 1
-                      ? "border-b border-b-[#eee]"
-                      : ""
-                  } ${selectedLang.code === lang.code ? "bg-[#F0F6FF]" : ""}`}
+                  className={`flex-row items-center px-[14px] py-[11px] ${index < LANGUAGES.length - 1
+                    ? "border-b border-b-[#eee]"
+                    : ""
+                    } ${selectedLang.code === lang.code ? "bg-[#F0F6FF]" : ""}`}
                   onPress={() => handleSelect(lang)}
                   activeOpacity={0.7}
                 >
                   <Text className="text-lg mr-[10px]">{lang.flag}</Text>
                   <Text
-                    className={`flex-1 text-sm font-medium ${
-                      selectedLang.code === lang.code
-                        ? "text-[#5086d7] font-semibold"
-                        : "text-[#333]"
-                    }`}
+                    className={`flex-1 text-sm font-medium ${selectedLang.code === lang.code
+                      ? "text-[#5086d7] font-semibold"
+                      : "text-[#333]"
+                      }`}
                   >
                     {lang.label}
                   </Text>

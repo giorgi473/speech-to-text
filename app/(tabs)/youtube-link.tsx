@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type TranscriptItem = {
   id: number;
@@ -24,6 +25,7 @@ export default function YouTubeLinkScreen() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptItem[]>([]);
+  const insets = useSafeAreaInsets();
 
   const isValid = url.includes("youtube.com") || url.includes("youtu.be");
 
@@ -51,11 +53,10 @@ export default function YouTubeLinkScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="bg-white mx-4 mt-4 rounded-[20px] p-5 gap-3">
+      <View className="bg-white rounded-[20px] p-5 gap-3">
         <Text className="text-xs font-bold text-[#9090A8] tracking-widest uppercase">
           YouTube ბმული
         </Text>
-
         <View
           className={`flex-row items-center bg-[#F7F8FC] rounded-xl px-[14px] py-3 border-[1.5px] ${url.length === 0
             ? "border-[#EEEEF5]"
@@ -118,8 +119,9 @@ export default function YouTubeLinkScreen() {
         </TouchableOpacity>
       </View>
       <ScrollView
-        className="flex-1"
+        className="flex-1 px-4 mt-2"
         contentContainerClassName="p-4 gap-3"
+        contentContainerStyle={{ paddingBottom: 8 }}
         showsVerticalScrollIndicator={false}
       >
         {transcripts.length === 0 ? (
