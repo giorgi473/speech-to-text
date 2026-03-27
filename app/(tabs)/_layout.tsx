@@ -1,7 +1,8 @@
-import { createContext, useContext, useRef, useState } from "react";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router, Tabs } from "expo-router";
+import { createContext, useContext, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -20,7 +21,7 @@ function TabBarIcon({
 const RecordingContext = createContext<{
   isRecording: boolean;
   setIsRecording: (v: boolean) => void;
-}>({ isRecording: false, setIsRecording: () => {} });
+}>({ isRecording: false, setIsRecording: () => { } });
 
 export const useRecording = () => useContext(RecordingContext);
 
@@ -170,7 +171,7 @@ function RecordTabButton(props: any) {
 }
 
 const tabBtnStyles = StyleSheet.create({
-  wrapper: { flex: 1, alignItems: "center", justifyContent: "center" },
+  wrapper: { flex: 1, alignItems: "center", justifyContent: "flex-start", paddingTop: 0 },
   square: {
     width: 50,
     height: 50,
@@ -179,36 +180,47 @@ const tabBtnStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     elevation: 0,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   squareRecording: { backgroundColor: "#E8504A" },
-  label: { fontSize: 11, fontWeight: "600", marginTop: 2, color: "#a19e9e" },
+  label: { fontSize: 11, fontWeight: "700", marginTop: 2, color: "#a19e9e" },
   labelRecording: { color: "#E8504A" },
 });
 
 // ── Tab Layout ─────────────────────────────────────────────────────────────────
 export default function TabLayout() {
   const [isRecording, setIsRecording] = useState(false);
+  const insets = useSafeAreaInsets();
 
   return (
     <RecordingContext.Provider value={{ isRecording, setIsRecording }}>
       <Tabs
         screenOptions={{
           tabBarStyle: {
-            paddingBottom: 8,
-            paddingTop: 8,
-            height: 75,
-            borderTopWidth: 0,
-            borderTopColor: "transparent",
+            paddingBottom: insets.bottom + 15,
+            paddingTop: 7,
+            height: insets.bottom + 80,
+            borderTopWidth: 0.6,
+            borderTopColor: "#f0f0f0",
             elevation: 0,
+            backgroundColor: "#fff",
           },
           headerStyle: {
             borderBottomWidth: 0.5,
-            borderBottomColor: "#e7e5e5",
+            borderBottomColor: "#d1d1d1",
             shadowOpacity: 0,
             elevation: 0,
           },
           headerShadowVisible: false,
           tabBarActiveTintColor: "#2D7CF6",
+          tabBarItemStyle: {
+            height: 65,
+            justifyContent: 'flex-start',
+            paddingTop: 0,
+          },
           tabBarLabelStyle: { fontSize: 11, fontWeight: "600", marginTop: 2 },
           headerRight: () => <BurgerButton />,
         }}

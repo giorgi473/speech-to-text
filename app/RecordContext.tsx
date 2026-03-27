@@ -42,3 +42,7 @@ export function useRecords() {
   }
   return ctx;
 }
+
+export default function RecordContextPlaceholder() {
+  return null;
+}

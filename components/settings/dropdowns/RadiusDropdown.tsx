@@ -38,11 +38,10 @@ export function RadiusDropdown({
     <View className="mb-3" style={styleWrapper}>
       <TouchableOpacity
         ref={triggerRef}
-        className={`flex-row items-center justify-between border-[1.5px] border-[#DDE6F5] px-4 py-[14px] bg-white ${
-          open
-            ? "rounded-tl-[10px] rounded-tr-[10px] rounded-bl-none rounded-br-none"
-            : "rounded-[10px]"
-        }`}
+        className={`flex-row items-center justify-between border-[1.5px] border-[#DDE6F5] px-4 py-[14px] bg-white ${open
+          ? "rounded-tl-[10px] rounded-tr-[10px] rounded-bl-none rounded-br-none"
+          : "rounded-[10px]"
+          }`}
         onPress={open ? closeMenu : openMenu}
         activeOpacity={0.8}
       >
@@ -76,17 +75,15 @@ export function RadiusDropdown({
               {options.map((opt) => (
                 <TouchableOpacity
                   key={opt.value}
-                  className={`flex-row items-center justify-between px-4 py-[13px] border-b border-[#F0F4FF] ${
-                    selected === opt.value ? "bg-[#F0F6FF]" : ""
-                  }`}
+                  className={`flex-row items-center justify-between px-4 py-[13px] border-b border-[#F0F4FF] ${selected === opt.value ? "bg-[#F0F6FF]" : ""
+                    }`}
                   onPress={() => handleSelect(opt.value)}
                 >
                   <Text
-                    className={`text-sm ${
-                      selected === opt.value
-                        ? "text-[#2D7CF6] font-semibold"
-                        : "text-[#444]"
-                    }`}
+                    className={`text-sm ${selected === opt.value
+                      ? "text-[#2D7CF6] font-semibold"
+                      : "text-[#444]"
+                      }`}
                   >
                     {opt.label}
                   </Text>

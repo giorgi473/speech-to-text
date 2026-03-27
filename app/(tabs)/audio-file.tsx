@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import Slider from "@react-native-community/slider";
 import { Audio, AVPlaybackStatus } from "expo-av";
 import * as MediaLibrary from "expo-media-library";
-import Slider from "@react-native-community/slider";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Animated,
   Easing,
@@ -11,9 +12,9 @@ import {
   SafeAreaView,
   Text,
   TouchableOpacity,
-  View,
-  ActivityIndicator,
+  View
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type PlayerStatus = "loading" | "playing" | "paused";
 
@@ -332,6 +333,7 @@ export default function MusicLibraryScreen() {
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const insets = useSafeAreaInsets();
   // ref so scroll lock is synchronous — no re-render needed
   const flatListRef = useRef<FlatList>(null);
 
@@ -352,10 +354,9 @@ export default function MusicLibraryScreen() {
 
       while (hasMore) {
         const page = await MediaLibrary.getAssetsAsync({
-          mediaType: MediaLibrary.MediaType.audio,
+          mediaType: "audio",
           first: 100,
           after,
-          sortBy: MediaLibrary.SortBy.default,
         });
 
         const mapped: Track[] = page.assets.map((a) => ({
@@ -391,14 +392,15 @@ export default function MusicLibraryScreen() {
   }, [activeIndex, tracks.length]);
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: "#FFFFFF" }}>
-      {/* Header */}
-      <View className="px-5 pt-5 pb-4">
-        {!loading && !permissionDenied && (
-          <Text className="text-md text-black mt-0.5">
-            {tracks.length} ტრეკი მოწყობილობაზე
-          </Text>
-        )}
+    <SafeAreaView className="flex-1 bg-white">
+      {/* Header Info */}
+      <View className="px-5 pt-4 pb-3">
+        <Text className="text-[17px] font-bold text-[#1A1A2E]">
+          თქვენი აუდიო ფაილები
+        </Text>
+        <Text className="text-[12px] text-[#7A8AAA] mt-1">
+          {tracks.length} ფაილი ნაპოვნია
+        </Text>
       </View>
 
       {/* Player */}
@@ -415,36 +417,35 @@ export default function MusicLibraryScreen() {
         />
       )}
 
-      {/* States */}
+      {/* Loading */}
       {loading && (
-        <View className="flex-1 items-center justify-center gap-3">
-          <ActivityIndicator size="large" color="#2D7CF6" />
-          <Text className="text-[#3A5080] text-sm">მუსიკა იტვირთება...</Text>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color="#2D7CF6" />
         </View>
       )}
 
-      {!loading && permissionDenied && (
-        <View className="flex-1 items-center justify-center px-8 gap-4">
-          <View className="w-20 h-20 rounded-xl bg-[#0C1525] items-center justify-center border border-[#192840]">
-            <Ionicons name="lock-closed-outline" size={36} color="#1E3050" />
-          </View>
-          <Text className="text-white text-base font-bold text-center">
-            წვდომა საჭიროა
+      {/* No Permission */}
+      {permissionDenied && (
+        <View className="flex-1 items-center justify-center px-10">
+          <Ionicons name="lock-closed-outline" size={48} color="#C5D5F5" />
+          <Text className="mt-4 text-center text-[15px] font-bold text-[#1A1A2E]">
+            წვდომა აკრძალულია
           </Text>
-          <Text className="text-[#3A5080] text-sm text-center">
-            მუსიკის სიის სანახავად გახსენით პარამეტრები და მიეცით მედია
-            ბიბლიოთეკაზე წვდომა.
+          <Text className="mt-2 text-center text-[13px] text-[#9090A8] leading-5">
+            გთხოვთ მოგვცეთ აუდიო ფაილებზე წვდომა პარამეტრებიდან
           </Text>
         </View>
       )}
 
+      {/* No Tracks */}
       {!loading && !permissionDenied && tracks.length === 0 && (
-        <View className="flex-1 items-center justify-center gap-4">
-          <View className="w-20 h-20 rounded-3xl bg-[#0C1525] items-center justify-center border border-[#192840]">
-            <Ionicons name="musical-notes-outline" size={36} color="#1E3050" />
-          </View>
-          <Text className="text-[#2A3A60] text-sm font-semibold text-center">
-            მოწყობილობაზე მუსიკა არ მოიძებნა
+        <View className="flex-1 items-center justify-center px-10">
+          <Ionicons name="musical-notes-outline" size={48} color="#C5D5F5" />
+          <Text className="mt-4 text-center text-[15px] font-bold text-[#1A1A2E]">
+            ფაილები ვერ მოიძებნა
+          </Text>
+          <Text className="mt-2 text-center text-[13px] text-[#9090A8] leading-5">
+            თქვენს მოწყობილობაზე აუდიო ფაილები არ არის
           </Text>
         </View>
       )}
@@ -457,7 +458,7 @@ export default function MusicLibraryScreen() {
           data={tracks}
           keyExtractor={(t) => t.id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          contentContainerStyle={{ paddingBottom: 8 }}
           renderItem={({ item: track, index }) => (
             <TrackRow
               track={track}

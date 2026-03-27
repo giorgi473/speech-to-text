@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import SettingsModal, { SettingsValues } from "@/components/settings";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   SafeAreaView,
@@ -8,10 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRecording } from "./_layout";
-import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRecords } from "../RecordContext";
-import SettingsModal, { SettingsValues } from "@/components/settings";
+import { useRecording } from "./_layout";
 
 const LIVE_CHUNKS = [
   "ტექნოლოგიები ყოველდღიურად იცვლება ",
@@ -54,6 +55,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
 export default function IndexScreen() {
   const { isRecording } = useRecording();
   const { addRecord } = useRecords();
+  const insets = useSafeAreaInsets();
 
   const [liveText, setLiveText] = useState("");
   const [showParams, setShowParams] = useState(false);
@@ -174,7 +176,7 @@ export default function IndexScreen() {
   }, [isRecording]);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <View className="flex-row items-center justify-between px-4 pt-3 pb-2">
         <View className="flex-row items-center">
           <Ionicons name="mic-outline" size={18} color="#2D7CF6" />
@@ -192,11 +194,15 @@ export default function IndexScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-      <View className="mx-4 mb-3 flex-1 overflow-hidden rounded-xl border border-[#f0f0f0] bg-white">
+      <View className="mx-4 mb-1 flex-1 overflow-hidden rounded-xl border border-[#f0f0f0] bg-white">
         <ScrollView
           ref={scrollRef}
           className="flex-1"
-          contentContainerStyle={{ padding: 18, flexGrow: 1 }}
+          contentContainerStyle={{
+            padding: 18,
+            paddingBottom: 8,
+            flexGrow: 1
+          }}
           showsVerticalScrollIndicator
         >
           {liveText ? (
@@ -218,11 +224,13 @@ export default function IndexScreen() {
               )}
             </View>
           ) : (
-            <View className="flex-1 items-center justify-center pt-16">
-              <Ionicons name="mic-outline" size={44} color="#C5D5F5" />
-              <Text className="mt-3.5 text-[17px] font-bold text-[#1A1A2E]">
-                {isRecording ? "მოსმენა..." : "ჩაიწერეთ ხმა"}
-              </Text>
+            <View className="flex-1 items-center justify-start pt-10">
+              <View className="flex-row items-center gap-2">
+                <Ionicons name="mic-outline" size={24} color="#C5D5F5" />
+                <Text className="text-[17px] font-bold text-[#1A1A2E]">
+                  {isRecording ? "მოსმენა..." : "ჩაიწერეთ ხმა"}
+                </Text>
+              </View>
               <Text className="mt-1.5 max-w-[220px] text-center text-[13px] leading-5 text-[#9090A8]">
                 {isRecording
                   ? "ლაპარაკი გრძელდება, ტექსტი გამოჩნდება..."
@@ -231,10 +239,6 @@ export default function IndexScreen() {
             </View>
           )}
         </ScrollView>
-      </View>
-
-      <View className="items-center pt-1.5 pb-8">
-        {/* აქ დაამატებ მიკrofონის ბಟონს / სხვა კონტროლებს */}
       </View>
       <SettingsModal
         visible={showParams}
