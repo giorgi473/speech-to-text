@@ -1,19 +1,24 @@
 import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { Audio, AVPlaybackStatus } from "expo-av";
+import * as Haptics from "expo-haptics";
 import * as MediaLibrary from "expo-media-library";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
-  Animated,
-  Easing,
   FlatList,
-  SafeAreaView,
+  Modal,
   Text,
   TouchableOpacity,
   View
 } from "react-native";
+import Reanimated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type PlayerStatus = "loading" | "playing" | "paused";
@@ -35,18 +40,101 @@ function fmtMs(ms: number) {
   return fmtSec(ms / 1000);
 }
 
+function EqualizerBar({ active }: { active: boolean }) {
+  const height = useSharedValue(0.3);
+
+  useEffect(() => {
+    if (active) {
+      height.value = withRepeat(
+        withSequence(
+          withTiming(Math.random() * 0.7 + 0.3, { duration: 250 + Math.random() * 250 }),
+          withTiming(0.2, { duration: 250 + Math.random() * 250 })
+        ),
+        -1,
+        true
+      );
+    } else {
+      height.value = withTiming(0.3, { duration: 300 });
+    }
+  }, [active]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scaleY: height.value }],
+  }));
+
+  return (
+    <Reanimated.View
+      className="w-[2.5px] h-5 rounded-full bg-[#2D7CF6]"
+      style={animatedStyle}
+    />
+  );
+}
+
+function CustomAlert({
+  visible,
+  title,
+  message,
+  onClose,
+}: {
+  visible: boolean;
+  title: string;
+  message: string;
+  onClose: () => void;
+}) {
+  return (
+    <Modal transparent visible={visible} animationType="fade">
+      <View className="flex-1 bg-black/40 items-center justify-center px-8">
+        <View
+          className="w-full bg-white rounded-[12px] overflow-hidden"
+          style={{
+            elevation: 10,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+          }}
+        >
+          <View className="p-6 items-center">
+            <View className="w-12 h-12 rounded-full bg-[#FFF0F0] items-center justify-center mb-4">
+              <Ionicons name="alert-circle" size={28} color="#FF4D4D" />
+            </View>
+            <Text className="text-[17px] font-bold text-[#1A1A2E] mb-2">{title}</Text>
+            <Text className="text-[14px] text-[#7A8AAA] text-center leading-5 mb-6">
+              {message}
+            </Text>
+            <TouchableOpacity
+              onPress={onClose}
+              className="w-full py-3.5 rounded-lg bg-[#2D7CF6] items-center justify-center"
+              style={{
+                shadowColor: "#2D7CF6",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+              }}
+            >
+              <Text className="text-white font-bold text-[15px]">გასაგებია</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 function PlayerBar({
   track,
   onClose,
   onNext,
   onPrev,
   onScrubChange,
+  onError,
 }: {
   track: Track;
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
   onScrubChange: (scrubbing: boolean) => void;
+  onError: (msg: string) => void;
 }) {
   const soundRef = useRef<Audio.Sound | null>(null);
   const [status, setStatus] = useState<PlayerStatus>("loading");
@@ -60,43 +148,6 @@ function PlayerBar({
     durMsRef.current = durMs;
   }, [durMs]);
 
-  const barAnims = useRef(
-    Array.from({ length: 4 }, () => new Animated.Value(0.3)),
-  ).current;
-
-  // equalizer
-  useEffect(() => {
-    if (status === "playing") {
-      barAnims.forEach((anim, i) => {
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(anim, {
-              toValue: 1,
-              duration: 360 + i * 100,
-              useNativeDriver: true,
-              easing: Easing.inOut(Easing.sin),
-            }),
-            Animated.timing(anim, {
-              toValue: 0.3,
-              duration: 360 + i * 100,
-              useNativeDriver: true,
-              easing: Easing.inOut(Easing.sin),
-            }),
-          ]),
-        ).start();
-      });
-    } else {
-      barAnims.forEach((anim) => {
-        anim.stopAnimation();
-        Animated.timing(anim, {
-          toValue: 0.3,
-          duration: 200,
-          useNativeDriver: true,
-        }).start();
-      });
-    }
-  }, [status]);
-
   // load track
   useEffect(() => {
     let mounted = true;
@@ -106,7 +157,6 @@ function PlayerBar({
 
     const load = async () => {
       try {
-        // unload previous
         if (soundRef.current) {
           await soundRef.current.unloadAsync();
           soundRef.current = null;
@@ -119,18 +169,19 @@ function PlayerBar({
 
         const { sound } = await Audio.Sound.createAsync(
           { uri: track.uri },
-          { shouldPlay: true },
+          { shouldPlay: true, shouldCorrectPitch: true },
           (s: AVPlaybackStatus) => {
             if (!mounted || !s.isLoaded) return;
             setStatus(s.isPlaying ? "playing" : "paused");
             const dur = s.durationMillis ?? track.duration * 1000;
             setDurMs(dur);
             durMsRef.current = dur;
-            // Don't override position while user is scrubbing
             if (!isScrubbing.current) {
               setPosMs(s.positionMillis ?? 0);
             }
-            if (s.didJustFinish) onNext();
+            if (s.didJustFinish) {
+              onNext();
+            }
           },
         );
 
@@ -138,7 +189,7 @@ function PlayerBar({
         if (mounted) setStatus("playing");
       } catch {
         if (mounted) setStatus("paused");
-        Alert.alert("შეცდომა", "ტრეკის გახსნა ვერ მოხერხდა.");
+        onError("ტრეკის გახსნა ვერ მოხერხდა.");
       }
     };
 
@@ -152,6 +203,7 @@ function PlayerBar({
 
   const togglePlay = useCallback(async () => {
     if (!soundRef.current) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (status === "playing") {
       await soundRef.current.pauseAsync();
     } else {
@@ -159,26 +211,57 @@ function PlayerBar({
     }
   }, [status]);
 
+  const skipForward = useCallback(async () => {
+    if (!soundRef.current) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const nextPos = Math.min(durMs, posMs + 10000);
+    await soundRef.current.setPositionAsync(nextPos);
+    setPosMs(nextPos);
+  }, [posMs, durMs]);
+
+  const skipBackward = useCallback(async () => {
+    if (!soundRef.current) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const nextPos = Math.max(0, posMs - 10000);
+    await soundRef.current.setPositionAsync(nextPos);
+    setPosMs(nextPos);
+  }, [posMs]);
+
+  const handleNext = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onNext();
+  }, [onNext]);
+
+  const handlePrev = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPrev();
+  }, [onPrev]);
+
   return (
     <View
-      className="mx-4 mb-3 rounded-2xl border"
-      style={{ backgroundColor: "#FFFFFF", borderColor: "#2D7CF6" }}
+      className="mx-4 mb-4 rounded-[14px]"
+      style={{
+        backgroundColor: "#FFFFFF",
+        elevation: 6,
+        shadowColor: "#2175e2",
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.5,
+        shadowRadius: 1,
+        borderWidth: 1,
+        borderColor: "rgba(100, 183, 255, 0.01)"
+      }}
     >
-      <View className="px-4 pt-4 pb-3">
+      <View className="px-5 pt-5 pb-4 overflow-hidden rounded-[14px]">
         {/* Track info + controls */}
-        <View className="flex-row items-center gap-3 mb-4">
+        <View className="flex-row items-center gap-4 mb-4">
           {/* Equalizer / loading */}
-          <View className="w-10 items-center">
+          <View className="w-12 h-12 rounded-2xl bg-[#F0F7FF] items-center justify-center">
             {status === "loading" ? (
               <ActivityIndicator size="small" color="#2D7CF6" />
             ) : (
-              <View className="flex-row items-end gap-[3px] h-5">
-                {barAnims.map((anim, i) => (
-                  <Animated.View
-                    key={i}
-                    className="w-[3px] rounded-full bg-[#2D7CF6]"
-                    style={{ height: 18, transform: [{ scaleY: anim }] }}
-                  />
+              <View className="flex-row items-end gap-[2px] h-5">
+                {[...Array(6)].map((_, i) => (
+                  <EqualizerBar key={i} active={status === "playing"} />
                 ))}
               </View>
             )}
@@ -187,14 +270,14 @@ function PlayerBar({
           {/* Title */}
           <View className="flex-1">
             <Text
-              className="text-sm font-bold"
+              className="text-[15px] font-bold"
               style={{ color: "#1A1A2E" }}
               numberOfLines={1}
             >
               {track.name}
             </Text>
             <Text
-              className="text-xs mt-0.5"
+              className="text-[12px] font-medium mt-0.5"
               style={{ color: "#7A8AAA" }}
               numberOfLines={1}
             >
@@ -202,68 +285,102 @@ function PlayerBar({
             </Text>
           </View>
 
-          {/* Prev */}
-          <TouchableOpacity onPress={onPrev} className="p-1">
-            <Ionicons name="play-skip-back" size={20} color="#7A8AAA" />
-          </TouchableOpacity>
-
-          {/* Play/Pause */}
-          <TouchableOpacity
-            onPress={togglePlay}
-            disabled={status === "loading"}
-            className="w-10 h-10 rounded-full bg-[#2D7CF6] items-center justify-center"
-          >
-            <Ionicons
-              name={status === "playing" ? "pause" : "play"}
-              size={20}
-              color="#fff"
-            />
-          </TouchableOpacity>
-
-          {/* Next */}
-          <TouchableOpacity onPress={onNext} className="p-1">
-            <Ionicons name="play-skip-forward" size={20} color="#7A8AAA" />
-          </TouchableOpacity>
-
-          {/* Close */}
-          <TouchableOpacity onPress={onClose} className="p-1">
-            <Ionicons name="close" size={18} color="#7A8AAA" />
-          </TouchableOpacity>
+          {/* Actions */}
+          <View className="flex-row items-center gap-2">
+            <TouchableOpacity
+              onPress={onClose}
+              className="w-8 h-8 rounded-full bg-[#F7F8FC] items-center justify-center"
+            >
+              <Ionicons name="close" size={18} color="#9090A8" />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Seek bar — native Slider */}
-        <Slider
-          style={{ width: "100%", height: 28, marginHorizontal: -4 }}
-          minimumValue={0}
-          maximumValue={durMs > 0 ? durMs : 1}
-          value={posMs}
-          minimumTrackTintColor="#2D7CF6"
-          maximumTrackTintColor="#D0D8E8"
-          thumbTintColor="#2D7CF6"
-          onSlidingStart={() => {
-            isScrubbing.current = true;
-            onScrubChange(true);
-          }}
-          onValueChange={(val) => {
-            setPosMs(val);
-          }}
-          onSlidingComplete={async (val) => {
-            isScrubbing.current = false;
-            onScrubChange(false);
-            if (soundRef.current) {
-              await soundRef.current.setPositionAsync(Math.floor(val));
-            }
-          }}
-        />
+        {/* Seek bar */}
+        <View className="mb-2">
+          <Slider
+            style={{ width: "100%", height: 40 }}
+            minimumValue={0}
+            maximumValue={durMs > 0 ? durMs : 1}
+            value={posMs}
+            minimumTrackTintColor="#2D7CF6"
+            maximumTrackTintColor="#E6EEFA"
+            thumbTintColor="#2D7CF6"
+            onSlidingStart={() => {
+              isScrubbing.current = true;
+              onScrubChange(true);
+            }}
+            onValueChange={(val) => {
+              setPosMs(val);
+            }}
+            onSlidingComplete={async (val) => {
+              if (soundRef.current) {
+                await soundRef.current.setPositionAsync(val);
+              }
+              isScrubbing.current = false;
+              onScrubChange(false);
+            }}
+          />
+          <View className="flex-row justify-between px-1 mt-[-8px]">
+            <Text className="text-[10px] font-bold text-[#9090A8]">{fmtMs(posMs)}</Text>
+            <Text className="text-[10px] font-bold text-[#9090A8]">{fmtMs(durMs)}</Text>
+          </View>
+        </View>
 
-        {/* Time */}
-        <View className="flex-row justify-between" style={{ marginTop: -4 }}>
-          <Text className="text-[10px]" style={{ color: "#8A9ABB" }}>
-            {fmtMs(posMs)}
-          </Text>
-          <Text className="text-[10px]" style={{ color: "#8A9ABB" }}>
-            {fmtMs(durMs)}
-          </Text>
+        {/* Main Controls */}
+        <View className="flex-row items-center justify-center">
+          <View className="flex-row items-center gap-4">
+            <TouchableOpacity onPress={handlePrev}>
+              <Ionicons name="play-skip-back" size={20} color="#1A1A2E" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={skipBackward}
+              className="items-center justify-center"
+              style={{ width: 32, height: 32 }}
+            >
+              <Ionicons name="refresh" size={22} color="#1A1A2E" style={{ transform: [{ scaleX: -1 }] }} />
+              <Text style={{ fontSize: 7, position: 'absolute', top: 12, fontWeight: 'bold', color: '#1A1A2E' }}>10</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={togglePlay}
+              disabled={status === "loading"}
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: 21,
+                backgroundColor: "#2D7CF6",
+                alignItems: "center",
+                justifyContent: "center",
+                elevation: 4,
+                shadowColor: "#2D7CF6",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2,
+                shadowRadius: 4,
+              }}
+            >
+              <Ionicons
+                name={status === "playing" ? "pause" : "play"}
+                size={22}
+                color="#fff"
+                style={{ marginLeft: status === "playing" ? 0 : 2 }}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={skipForward}
+              className="items-center justify-center"
+              style={{ width: 32, height: 32 }}
+            >
+              <Ionicons name="refresh" size={22} color="#1A1A2E" />
+              <Text style={{ fontSize: 7, position: 'absolute', top: 12, fontWeight: 'bold', color: '#1A1A2E' }}>10</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleNext}>
+              <Ionicons name="play-skip-forward" size={20} color="#1A1A2E" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -333,6 +450,11 @@ export default function MusicLibraryScreen() {
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const [alert, setAlert] = useState<{ visible: boolean; title: string; message: string }>({
+    visible: false,
+    title: "",
+    message: "",
+  });
   const insets = useSafeAreaInsets();
   // ref so scroll lock is synchronous — no re-render needed
   const flatListRef = useRef<FlatList>(null);
@@ -392,9 +514,15 @@ export default function MusicLibraryScreen() {
   }, [activeIndex, tracks.length]);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+      <CustomAlert
+        visible={alert.visible}
+        title={alert.title}
+        message={alert.message}
+        onClose={() => setAlert({ ...alert, visible: false })}
+      />
       {/* Header Info */}
-      <View className="px-5 pt-4 pb-3">
+      <View className="px-5 pt-0 pb-3" style={{ marginTop: -16 }}>
         <Text className="text-[17px] font-bold text-[#1A1A2E]">
           თქვენი აუდიო ფაილები
         </Text>
@@ -414,6 +542,7 @@ export default function MusicLibraryScreen() {
             // synchronous — directly toggle scrollability on the FlatList node
             flatListRef.current?.setNativeProps({ scrollEnabled: !scrubbing });
           }}
+          onError={(msg) => setAlert({ visible: true, title: "შეცდომა", message: msg })}
         />
       )}
 
@@ -469,6 +598,6 @@ export default function MusicLibraryScreen() {
           )}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
