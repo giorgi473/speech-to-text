@@ -18,7 +18,7 @@ const YouTubeInput: React.FC<YouTubeInputProps> = ({
   onProcess,
 }) => {
   return (
-    <View className="bg-white rounded-[20px] p-5 pt-0 gap-3" style={{ marginTop: -11 }}>
+    <View className="bg-white rounded-[20px] px-4 pb-1 pt-0 gap-3" style={{ marginTop: -11 }}>
       <Text className="text-xs font-bold text-[#9090A8] tracking-widest uppercase">
         YouTube ბმული
       </Text>
