@@ -77,7 +77,7 @@ export default function MusicLibraryScreen() {
   }, [activeIndex, tracks.length]);
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-white dark:bg-[#121212]" style={{ paddingTop: insets.top }}>
       <CustomAlert
         visible={alert.visible}
         title={alert.title}
@@ -86,10 +86,10 @@ export default function MusicLibraryScreen() {
       />
       {/* Header Info */}
       <View className="px-5 pt-0 pb-3" style={{ marginTop: -16 }}>
-        <Text className="text-[17px] font-bold text-[#1A1A2E]">
+        <Text className="text-[17px] font-bold text-[#1A1A2E] dark:text-[#E0E0E0]">
           თქვენი აუდიო ფაილები
         </Text>
-        <Text className="text-[12px] text-[#7A8AAA] mt-1">
+        <Text className="text-[12px] text-[#7A8AAA] dark:text-[#9090A8] mt-1">
           {tracks.length} ფაილი ნაპოვნია
         </Text>
       </View>

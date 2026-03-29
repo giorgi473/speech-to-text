@@ -18,13 +18,13 @@ const YouTubeInput: React.FC<YouTubeInputProps> = ({
   onProcess,
 }) => {
   return (
-    <View className="bg-white rounded-[20px] px-4 pb-1 pt-0 gap-3" style={{ marginTop: -11 }}>
-      <Text className="text-xs font-bold text-[#9090A8] tracking-widest uppercase">
+    <View className="bg-white dark:bg-[#121212] rounded-[20px] px-4 pb-1 pt-0 gap-3" style={{ marginTop: -11 }}>
+      <Text className="text-xs font-bold text-[#9090A8] dark:text-[#9090A8] tracking-widest uppercase">
         YouTube ბმული
       </Text>
       <View
-        className={`flex-row items-center bg-[#F7F8FC] rounded-xl px-[14px] py-3 border-[1.5px] ${url.length === 0
-          ? "border-[#EEEEF5]"
+        className={`flex-row items-center bg-[#F7F8FC] dark:bg-[#1E1E2E] rounded-xl px-[14px] py-3 border-[1.5px] ${url.length === 0
+          ? "border-[#EEEEF5] dark:border-[#2D2D3F]"
           : isValid
             ? "border-green-500"
             : "border-red-200"
@@ -37,7 +37,7 @@ const YouTubeInput: React.FC<YouTubeInputProps> = ({
           style={{ marginRight: 10 }}
         />
         <TextInput
-          className="flex-1 text-sm text-[#1A1A2E] font-medium"
+          className="flex-1 text-sm text-[#1A1A2E] dark:text-[#E0E0E0] font-medium"
           placeholder="https://youtube.com/watch?v=..."
           placeholderTextColor="#C0C0D0"
           value={url}
@@ -60,7 +60,7 @@ const YouTubeInput: React.FC<YouTubeInputProps> = ({
       )}
 
       <TouchableOpacity
-        className={`rounded-xl py-[15px] flex-row items-center justify-center ${!isValid || loading ? "bg-[#D0D0E0]" : "bg-red-600"
+        className={`rounded-xl py-[15px] flex-row items-center justify-center ${!isValid || loading ? "bg-[#D0D0E0] dark:bg-[#2D2D3F]" : "bg-red-600"
           }`}
         onPress={onProcess}
         disabled={!isValid || loading}

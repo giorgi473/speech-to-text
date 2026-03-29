@@ -12,14 +12,14 @@ export default function HistoryScreen() {
 
   return (
     <GestureHandlerRootView className="flex-1">
-      <View className="flex-1 bg-[#F5F5F5]">
+      <View className="flex-1 bg-[#F5F5F5] dark:bg-[#121212]">
         {/* Header */}
         <View
-          className="flex-row items-center px-2 pt-[42px] pb-[14px] bg-white border-b border-b-[#e7e5e5] z-[100] overflow-visible"
+          className="flex-row items-center px-2 pt-[42px] pb-[14px] bg-white dark:bg-[#1A1A2E] border-b border-b-[#e7e5e5] dark:border-b-[#2D2D3F] z-[100] overflow-visible"
           style={{ borderBottomWidth: 0.5 }}
         >
           <TouchableOpacity onPress={() => router.back()} className="p-2">
-            <Ionicons name="chevron-back" size={26} color="#333" />
+            <Ionicons name="chevron-back" size={26} color="#333" className="dark:text-white" />
           </TouchableOpacity>
           <UserProfileRow email="giorgi.kavtaradze@gmail.com" />
         </View>
