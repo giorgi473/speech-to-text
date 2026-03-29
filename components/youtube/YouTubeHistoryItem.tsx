@@ -5,22 +5,25 @@ import { Image, Linking, Text, TouchableOpacity, View } from "react-native";
 
 interface YouTubeHistoryItemProps {
   item: TranscriptItem;
+  onDelete: (id: number) => void;
 }
 
-const YouTubeHistoryItem: React.FC<YouTubeHistoryItemProps> = ({ item }) => {
+const YouTubeHistoryItem: React.FC<YouTubeHistoryItemProps> = ({ item, onDelete }) => {
   const openUrl = (url: string) => {
     Linking.openURL(url).catch(() => {});
   };
 
   return (
-    <View className="bg-white rounded-xl p-5 gap-4 shadow-sm border border-[#EBEBF5] relative">
-      {/* Top-right link icon */}
-      <TouchableOpacity
-        onPress={() => openUrl(item.url)}
-        className="absolute top-5 right-5 z-10"
-      >
-        <Ionicons name="open-outline" size={18} color="#2D7CF6" />
-      </TouchableOpacity>
+    <View className="bg-white rounded-xl p-4 gap-4 border border-[#EBEBF5] relative">
+      {/* Top-right icons */}
+      <View className="absolute top-5 right-5 z-10">
+        <TouchableOpacity
+          onPress={() => onDelete(item.id)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="trash-outline" size={18} color="#FF4D4D" />
+        </TouchableOpacity>
+      </View>
 
       <View className="flex-row items-center">
         <View className="flex-row items-center gap-3 flex-1 pr-10">

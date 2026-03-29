@@ -1,9 +1,9 @@
-import React from "react";
-import { View } from "react-native";
 import CustomAlert from "@/components/CustomAlert";
 import YouTubeHistoryList from "@/components/youtube/YouTubeHistoryList";
 import YouTubeInput from "@/components/youtube/YouTubeInput";
 import { useYouTubeProcessor } from "@/hooks/useYouTubeProcessor";
+import React from "react";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function YouTubeLinkScreen() {
@@ -18,6 +18,7 @@ export default function YouTubeLinkScreen() {
     isValid,
     handleProcess,
     clearHistory,
+    deleteItem,
   } = useYouTubeProcessor();
 
   return (
@@ -40,6 +41,7 @@ export default function YouTubeLinkScreen() {
       <YouTubeHistoryList
         transcripts={transcripts}
         onClear={clearHistory}
+        onDelete={deleteItem}
       />
     </View>
   );

@@ -46,23 +46,29 @@ export const useYouTubeProcessor = () => {
   useEffect(() => {
     const saveHistory = async () => {
       try {
-        await AsyncStorage.setItem("youtube_history", JSON.stringify(transcripts));
+        if (transcripts.length === 0) {
+          // If we want to check if it was intentionally cleared
+          // We can check if the storage currently has items
+          const savedHistory = await AsyncStorage.getItem("youtube_history");
+          if (savedHistory && JSON.parse(savedHistory).length > 0) {
+            await AsyncStorage.setItem("youtube_history", JSON.stringify([]));
+          }
+        } else {
+          await AsyncStorage.setItem("youtube_history", JSON.stringify(transcripts));
+        }
       } catch (e) {
         console.error("Failed to save history", e);
       }
     };
-    if (transcripts.length > 0) {
-      saveHistory();
-    }
+    saveHistory();
   }, [transcripts]);
 
   const clearHistory = async () => {
-    try {
-      await AsyncStorage.removeItem("youtube_history");
-      setTranscripts([]);
-    } catch (e) {
-      console.error("Failed to clear history", e);
-    }
+    setTranscripts([]);
+  };
+
+  const deleteItem = async (id: number) => {
+    setTranscripts((prev) => prev.filter((t) => t.id !== id));
   };
 
   const handleProcess = async () => {
@@ -185,5 +191,6 @@ export const useYouTubeProcessor = () => {
     isValid,
     handleProcess,
     clearHistory,
+    deleteItem,
   };
 };
