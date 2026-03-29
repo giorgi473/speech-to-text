@@ -22,7 +22,7 @@ export default function YouTubeLinkScreen() {
   } = useYouTubeProcessor();
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-white dark:bg-[#121212]" style={{ paddingTop: insets.top }}>
       <CustomAlert
         visible={alert.visible}
         title={alert.title}

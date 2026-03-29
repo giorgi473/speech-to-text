@@ -6,6 +6,7 @@ import { Audio, AVPlaybackStatus } from "expo-av";
 import * as Haptics from "expo-haptics";
 import { PlayerStatus, Track } from "../../types/audio";
 import EqualizerBar from "./EqualizerBar";
+import { useTheme } from "../../app/ThemeContext";
 
 interface PlayerBarProps {
   track: Track;
@@ -31,6 +32,7 @@ export default function PlayerBar({
   onScrubChange,
   onError,
 }: PlayerBarProps) {
+  const { isDark } = useTheme();
   const soundRef = useRef<Audio.Sound | null>(null);
   const [status, setStatus] = useState<PlayerStatus>("loading");
   const [posMs, setPosMs] = useState(0);
@@ -134,19 +136,19 @@ export default function PlayerBar({
     <View
       className="mx-4 mb-4 rounded-[24px]"
       style={{
-        backgroundColor: "#FFFFFF",
+        backgroundColor: isDark ? "#1E1E2E" : "#FFFFFF",
         elevation: 6,
-        shadowColor: "#2175e2",
+        shadowColor: isDark ? "#000" : "#2175e2",
         shadowOffset: { width: 2, height: 2 },
-        shadowOpacity: 0.5,
+        shadowOpacity: isDark ? 0.3 : 0.5,
         shadowRadius: 1,
         borderWidth: 1,
-        borderColor: "rgba(100, 183, 255, 0.01)",
+        borderColor: isDark ? "#2D2D3F" : "rgba(100, 183, 255, 0.01)",
       }}
     >
       <View className="px-5 pt-5 pb-4 overflow-hidden rounded-[24px]">
         <View className="flex-row items-center gap-4 mb-4">
-          <View className="w-12 h-12 rounded-2xl bg-[#F0F7FF] items-center justify-center">
+          <View className="w-12 h-12 rounded-2xl bg-[#F0F7FF] dark:bg-[#2D2D3F] items-center justify-center">
             {status === "loading" ? (
               <ActivityIndicator size="small" color="#2D7CF6" />
             ) : (
@@ -161,14 +163,14 @@ export default function PlayerBar({
           <View className="flex-1">
             <Text
               className="text-[15px] font-bold"
-              style={{ color: "#1A1A2E" }}
+              style={{ color: isDark ? "#FFFFFF" : "#1A1A2E" }}
               numberOfLines={1}
             >
               {track.name}
             </Text>
             <Text
               className="text-[12px] font-medium mt-0.5"
-              style={{ color: "#7A8AAA" }}
+              style={{ color: isDark ? "#9090A8" : "#7A8AAA" }}
               numberOfLines={1}
             >
               {track.artist}
@@ -178,7 +180,7 @@ export default function PlayerBar({
           <View className="flex-row items-center gap-2">
             <TouchableOpacity
               onPress={onClose}
-              className="w-8 h-8 rounded-full bg-[#F7F8FC] items-center justify-center"
+              className="w-8 h-8 rounded-full bg-[#F7F8FC] dark:bg-[#2D2D3F] items-center justify-center"
             >
               <Ionicons name="close" size={18} color="#9090A8" />
             </TouchableOpacity>
@@ -192,7 +194,7 @@ export default function PlayerBar({
             maximumValue={durMs > 0 ? durMs : 1}
             value={posMs}
             minimumTrackTintColor="#2D7CF6"
-            maximumTrackTintColor="#E6EEFA"
+            maximumTrackTintColor={isDark ? "#2D2D3F" : "#E6EEFA"}
             thumbTintColor="#2D7CF6"
             onSlidingStart={() => {
               isScrubbing.current = true;
@@ -222,7 +224,7 @@ export default function PlayerBar({
         <View className="flex-row items-center justify-center">
           <View className="flex-row items-center gap-4">
             <TouchableOpacity onPress={handlePrev}>
-              <Ionicons name="play-skip-back" size={20} color="#1A1A2E" />
+              <Ionicons name="play-skip-back" size={20} color={isDark ? "#FFFFFF" : "#1A1A2E"} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -233,7 +235,7 @@ export default function PlayerBar({
               <Ionicons
                 name="refresh"
                 size={22}
-                color="#1A1A2E"
+                color={isDark ? "#FFFFFF" : "#1A1A2E"}
                 style={{ transform: [{ scaleX: -1 }] }}
               />
               <Text
@@ -242,7 +244,7 @@ export default function PlayerBar({
                   position: "absolute",
                   top: 12,
                   fontWeight: "bold",
-                  color: "#1A1A2E",
+                  color: isDark ? "#FFFFFF" : "#1A1A2E",
                 }}
               >
                 10
@@ -279,14 +281,14 @@ export default function PlayerBar({
               className="items-center justify-center"
               style={{ width: 32, height: 32 }}
             >
-              <Ionicons name="refresh" size={22} color="#1A1A2E" />
+              <Ionicons name="refresh" size={22} color={isDark ? "#FFFFFF" : "#1A1A2E"} />
               <Text
                 style={{
                   fontSize: 7,
                   position: "absolute",
                   top: 12,
                   fontWeight: "bold",
-                  color: "#1A1A2E",
+                  color: isDark ? "#FFFFFF" : "#1A1A2E",
                 }}
               >
                 10
@@ -294,7 +296,7 @@ export default function PlayerBar({
             </TouchableOpacity>
 
             <TouchableOpacity onPress={handleNext}>
-              <Ionicons name="play-skip-forward" size={20} color="#1A1A2E" />
+              <Ionicons name="play-skip-forward" size={20} color={isDark ? "#FFFFFF" : "#1A1A2E"} />
             </TouchableOpacity>
           </View>
         </View>

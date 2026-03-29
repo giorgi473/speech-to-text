@@ -175,16 +175,16 @@ export default function IndexScreen() {
   }, [isRecording]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', paddingTop: insets.top }}>
+    <View className="flex-1 bg-white dark:bg-[#121212]" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-4 pt-0 pb-2" style={{ marginTop: -12 }}>
         <View className="flex-row items-center">
           <Ionicons name="mic-outline" size={18} color="#2D7CF6" />
-          <Text className="ml-1.5 text-[14px] font-semibold text-[#1A1A2E]">
+          <Text className="ml-1.5 text-[14px] font-semibold text-[#1A1A2E] dark:text-[#E0E0E0]">
             {isRecording ? "ჩანაწერი მიდის..." : "დაიწყე ჩანაწერა..."}
           </Text>
         </View>
         <TouchableOpacity
-          className="flex-row items-center rounded-md border border-[#86b4fa] bg-white px-3 py-1.5"
+          className="flex-row items-center rounded-md border border-[#86b4fa] bg-white dark:bg-[#1E1E2E] px-3 py-1.5"
           onPress={() => setShowParams(true)}
         >
           <Ionicons name="settings-outline" size={16} color="#2D7CF6" />
@@ -193,7 +193,7 @@ export default function IndexScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-      <View className="mx-4 mb-1 flex-1 overflow-hidden rounded-xl border border-[#f0f0f0] bg-white">
+      <View className="mx-4 mb-1 flex-1 overflow-hidden rounded-xl border border-[#f0f0f0] dark:border-[#2D2D3F] bg-white dark:bg-[#1E1E2E]">
         <ScrollView
           ref={scrollRef}
           className="flex-1"
@@ -206,7 +206,7 @@ export default function IndexScreen() {
         >
           {liveText ? (
             <View className="flex-row flex-wrap">
-              <Text className="text-[16px] font-normal leading-[26px] text-[#1A1A2E]">
+              <Text className="text-[16px] font-normal leading-[26px] text-[#1A1A2E] dark:text-[#E0E0E0]">
                 {liveText}
               </Text>
               {isRecording && (
@@ -226,11 +226,11 @@ export default function IndexScreen() {
             <View className="flex-1 items-center justify-start pt-10">
               <View className="flex-row items-center gap-2">
                 <Ionicons name="mic-outline" size={24} color="#C5D5F5" />
-                <Text className="text-[17px] font-bold text-[#1A1A2E]">
+                <Text className="text-[17px] font-bold text-[#1A1A2E] dark:text-[#E0E0E0]">
                   {isRecording ? "მოსმენა..." : "ჩაიწერეთ ხმა"}
                 </Text>
               </View>
-              <Text className="mt-1.5 max-w-[220px] text-center text-[13px] leading-5 text-[#9090A8]">
+              <Text className="mt-1.5 max-w-[220px] text-center text-[13px] leading-5 text-[#9090A8] dark:text-[#9090A8]">
                 {isRecording
                   ? "ლაპარაკი გრძელდება, ტექსტი გამოჩნდება..."
                   : "დააჭირეთ ქვემოთ მიკროფონს"}

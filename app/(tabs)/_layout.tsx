@@ -3,8 +3,9 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { MusicNoteSquare02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react-native";
 import { router, Tabs } from "expo-router";
-import { Animated, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "../ThemeContext";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -33,21 +34,41 @@ const RecordingContext = createContext<{
 
 export const useRecording = () => useContext(RecordingContext);
 
-// ── Burger Button ──────────────────────────────────────────────────────────────
-function BurgerButton() {
+// ── Header Right Buttons ────────────────────────────────────────────────────────
+function HeaderButtons() {
+  const { isDark, setTheme, theme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
+
   return (
-    <TouchableOpacity
-      onPress={() => router.push("/history")}
-      style={{ paddingHorizontal: 16 }}
-      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-    >
-      <MaterialIcons name="menu" size={28} color="#333" />
-    </TouchableOpacity>
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <TouchableOpacity
+        onPress={toggleTheme}
+        style={{ paddingHorizontal: 8 }}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <Ionicons
+          name={isDark ? "sunny-outline" : "moon-outline"}
+          size={24}
+          color={isDark ? "#FFFFFF" : "#333"}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => router.push("/history")}
+        style={{ paddingHorizontal: 16 }}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <MaterialIcons name="menu" size={28} color={isDark ? "#FFFFFF" : "#333"} />
+      </TouchableOpacity>
+    </View>
   );
 }
 
 // ── Flip Title ─────────────────────────────────────────────────────────────────
 function FlipTitle() {
+  const { isDark } = useTheme();
   const [flipped, setFlipped] = useState(false);
   const translateY = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
@@ -101,7 +122,9 @@ function FlipTitle() {
       <Animated.View
         style={[flipStyles.row, { transform: [{ translateY }], opacity }]}
       >
-        <Text style={flipStyles.title}>{flipped ? labels[1] : labels[0]}</Text>
+        <Text style={[flipStyles.title, isDark && { color: "#FFFFFF" }]}>
+          {flipped ? labels[1] : labels[0]}
+        </Text>
         <Animated.View style={{ transform: [{ rotate: spin }] }}>
           <MaterialIcons
             name="swap-horiz"
@@ -110,7 +133,9 @@ function FlipTitle() {
             style={{ marginHorizontal: 6 }}
           />
         </Animated.View>
-        <Text style={flipStyles.title}>{flipped ? labels[0] : labels[1]}</Text>
+        <Text style={[flipStyles.title, isDark && { color: "#FFFFFF" }]}>
+          {flipped ? labels[0] : labels[1]}
+        </Text>
       </Animated.View>
     </TouchableOpacity>
   );
@@ -130,6 +155,7 @@ const flipStyles = StyleSheet.create({
 
 // ── Record Tab Button ──────────────────────────────────────────────────────────
 function RecordTabButton(props: any) {
+  const { isDark } = useTheme();
   const { isRecording, setIsRecording } = useContext(RecordingContext);
   const scale = useRef(new Animated.Value(1)).current;
 
@@ -170,7 +196,11 @@ function RecordTabButton(props: any) {
         />
       </Animated.View>
       <Text
-        style={[tabBtnStyles.label, isRecording && tabBtnStyles.labelRecording]}
+        style={[
+          tabBtnStyles.label,
+          isDark && { color: "#9090A8" },
+          isRecording && tabBtnStyles.labelRecording,
+        ]}
       >
         {isRecording ? "შეჩერება" : "ჩაწერა"}
       </Text>
@@ -200,6 +230,7 @@ const tabBtnStyles = StyleSheet.create({
 
 // ── Tab Layout ─────────────────────────────────────────────────────────────────
 export default function TabLayout() {
+  const { isDark } = useTheme();
   const [isRecording, setIsRecording] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -212,31 +243,34 @@ export default function TabLayout() {
             paddingTop: 7,
             height: insets.bottom + 80,
             borderTopWidth: 0.6,
-            borderTopColor: "#f0f0f0",
+            borderTopColor: isDark ? "#2D2D3F" : "#f0f0f0",
             elevation: 0,
-            backgroundColor: "#fff",
+            backgroundColor: isDark ? "#1A1A2E" : "#fff",
           },
           headerStyle: {
             borderBottomWidth: 0.5,
-            borderBottomColor: "#d1d1d1",
+            borderBottomColor: isDark ? "#2D2D3F" : "#d1d1d1",
             shadowOpacity: 0,
             elevation: 0,
+            backgroundColor: isDark ? "#1A1A2E" : "#fff",
           },
           headerShadowVisible: false,
           tabBarActiveTintColor: "#2D7CF6",
+          tabBarInactiveTintColor: isDark ? "#9090A8" : "#9090A8",
           tabBarItemStyle: {
             height: 55,
             justifyContent: 'center',
             alignItems: 'center',
           },
           tabBarLabelStyle: { fontSize: 11, fontWeight: "600", marginTop: 2 },
-          headerRight: () => <BurgerButton />,
+          headerRight: () => <HeaderButtons />,
         }}
       >
         <Tabs.Screen
           name="audio-file"
           options={{
             title: "აუდიო ფაილი",
+            headerTitleStyle: { color: isDark ? "#FFFFFF" : "#000" },
             tabBarIcon: ({ focused }) => (
               <TabBarIcon
                 hugeIcon={MusicNoteSquare02Icon}
@@ -257,6 +291,7 @@ export default function TabLayout() {
           name="youtube-link"
           options={{
             title: "YouTube Link",
+            headerTitleStyle: { color: isDark ? "#FFFFFF" : "#000" },
             tabBarIcon: ({ focused }) => (
               <TabBarIcon
                 name="logo-youtube"

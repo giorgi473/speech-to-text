@@ -17,9 +17,9 @@ export default function CustomAlert({
 }: CustomAlertProps) {
   return (
     <Modal transparent visible={visible} animationType="fade">
-      <View className="flex-1 bg-black/40 items-center justify-center px-8">
+      <View className="flex-1 bg-black/60 items-center justify-center px-8">
         <View
-          className="w-full bg-white rounded-[12px] overflow-hidden"
+          className="w-full bg-white dark:bg-[#1E1E2E] rounded-[12px] overflow-hidden"
           style={{
             elevation: 10,
             shadowColor: "#000",
@@ -29,11 +29,11 @@ export default function CustomAlert({
           }}
         >
           <View className="p-6 items-center">
-            <View className="w-12 h-12 rounded-full bg-[#FFF0F0] items-center justify-center mb-4">
+            <View className="w-12 h-12 rounded-full bg-[#FFF0F0] dark:bg-[#2D1D1D] items-center justify-center mb-4">
               <Ionicons name="alert-circle" size={28} color="#FF4D4D" />
             </View>
-            <Text className="text-[17px] font-bold text-[#1A1A2E] mb-2">{title}</Text>
-            <Text className="text-[14px] text-[#7A8AAA] text-center leading-5 mb-6">
+            <Text className="text-[17px] font-bold text-[#1A1A2E] dark:text-[#FFFFFF] mb-2">{title}</Text>
+            <Text className="text-[14px] text-[#7A8AAA] dark:text-[#9090A8] text-center leading-5 mb-6">
               {message}
             </Text>
             <TouchableOpacity

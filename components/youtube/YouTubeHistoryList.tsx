@@ -22,8 +22,8 @@ const YouTubeHistoryList: React.FC<YouTubeHistoryListProps> = ({
       showsVerticalScrollIndicator={false}
     >
       {transcripts.length > 0 && (
-        <View className="flex-row items-center justify-between">
-          <Text className="text-[13px] font-bold text-[#9090A8] uppercase tracking-widest">
+        <View className="flex-row items-center justify-between px-1">
+          <Text className="text-[13px] font-bold text-[#9090A8] dark:text-[#9090A8] uppercase tracking-widest">
             ბოლო ტრანსკრიფციები
           </Text>
           <TouchableOpacity onPress={onClear}>
@@ -34,14 +34,14 @@ const YouTubeHistoryList: React.FC<YouTubeHistoryListProps> = ({
 
       {transcripts.length === 0 ? (
         <View className="items-center py-16 gap-4 px-8">
-          <View className="w-24 h-24 rounded-full bg-white items-center justify-center border border-[#F0F0F5]">
+          <View className="w-24 h-24 rounded-full bg-white dark:bg-[#1E1E2E] shadow-sm items-center justify-center border border-[#F0F0F5] dark:border-[#2D2D3F]">
             <Ionicons name="logo-youtube" size={44} color="#FFD5D5" />
           </View>
           <View className="gap-2 items-center">
-            <Text className="text-lg font-bold text-[#1A1A2E] text-center">
+            <Text className="text-lg font-bold text-[#1A1A2E] dark:text-[#E0E0E0] text-center">
               ჯერჯერობით ცარიელია
             </Text>
-            <Text className="text-[15px] text-[#9090A8] text-center leading-6">
+            <Text className="text-[15px] text-[#9090A8] dark:text-[#9090A8] text-center leading-6">
               ჩასვით YouTube ვიდეოს ბმული ზემოთ და მიიღეთ ტექსტური ვერსია წამებში
             </Text>
           </View>
