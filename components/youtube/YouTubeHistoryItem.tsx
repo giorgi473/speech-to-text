@@ -10,7 +10,7 @@ interface YouTubeHistoryItemProps {
 
 const YouTubeHistoryItem: React.FC<YouTubeHistoryItemProps> = ({ item, onDelete }) => {
   const openUrl = (url: string) => {
-    Linking.openURL(url).catch(() => {});
+    Linking.openURL(url).catch(() => { });
   };
 
   return (
@@ -66,11 +66,11 @@ const YouTubeHistoryItem: React.FC<YouTubeHistoryItemProps> = ({ item, onDelete 
           <Text className="text-[10px] font-bold text-green-600 uppercase">მზადაა</Text>
         </View>
         <TouchableOpacity
-          className="flex-row items-center gap-1.5 bg-[#2D7CF6] px-5 py-2.5 rounded-xl"
+          className="flex-row items-center gap-1.5 bg-[#2D7CF6] px-2 py-1.5 rounded-lg"
           onPress={() => openUrl(item.url)}
         >
-          <Ionicons name="document-text-outline" size={15} color="white" />
-          <Text className="text-[14px] text-white font-bold">ნახვა</Text>
+          <Ionicons name="document-text-outline" size={14} color="white" />
+          <Text className="text-[12px] text-white font-bold">ნახვა</Text>
         </TouchableOpacity>
       </View>
     </View>
