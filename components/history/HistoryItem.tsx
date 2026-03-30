@@ -73,9 +73,9 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ record, onDelete }) => {
         rightThreshold={40}
         overshootRight={false}
         friction={2}
-        containerStyle={{ borderRadius: 12, overflow: "hidden" }}
+        containerStyle={{ borderRadius: 4, overflow: "hidden" }}
       >
-        <View className="p-4 bg-white rounded-xl border border-[#e8eeff]">
+        <View className="p-4 bg-white dark:bg-[#1A1A2E] rounded-lg border border-[#e8eeff] dark:border-[#110f2f]">
           {/* Card Header */}
           <View className="flex-row items-center mb-[6px]">
             <Ionicons
@@ -84,7 +84,7 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ record, onDelete }) => {
               color="#bbb"
               style={{ marginRight: 5 }}
             />
-            <Text className="text-[11px] text-[#aaa]">
+            <Text className="text-[11px] text-[#aaa] dark:text-zinc-400">
               {record.date} · {record.duration}
             </Text>
           </View>
@@ -99,12 +99,12 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ record, onDelete }) => {
               <Ionicons
                 name="create-outline"
                 size={18}
-                color={expanded ? "#2D7CF6" : "#777"}
+                color={expanded ? "#3a5396" : "#777"}
               />
             </TouchableOpacity>
 
             <Text
-              className="text-[15px] text-[#333] leading-[22px]"
+              className="text-[15px] text-[#333] dark:text-zinc-400 leading-[22px]"
               numberOfLines={expanded ? undefined : 2}
               ellipsizeMode="tail"
             >
