@@ -39,6 +39,11 @@ export const MICROPHONE_OPTIONS: DropdownOption[] = [
   { label: "სისტემის ხმა", value: "external" },
 ];
 
+export const THEME_OPTIONS: DropdownOption[] = [
+  { label: "ნათელი", value: "light" },
+  { label: "ბნელი", value: "dark" },
+];
+
 export const DEFAULT_SETTINGS: SettingsValues = {
   language: "ka",
   speakerOutput: "diarization",
@@ -46,4 +51,5 @@ export const DEFAULT_SETTINGS: SettingsValues = {
   microphone: "default",
   punctuation: true,
   autoCorrect: false,
+  theme: "light",
 };

@@ -5,22 +5,23 @@ import {
   PanGestureHandler,
 } from "react-native-gesture-handler";
 
+import { useTheme } from "@/context/ThemeContext";
+import { Toggle } from "./Toggle";
 import {
   DEFAULT_SETTINGS,
   LANGUAGE_OPTIONS,
   MICROPHONE_OPTIONS,
   SPEAKER_OUTPUT_OPTIONS,
-  STT_MODEL_OPTIONS,
+  STT_MODEL_OPTIONS
 } from "./constants";
-import { SettingsModalProps, SettingsValues } from "./types";
-import { Toggle } from "./Toggle";
-import { useSheetAnimation } from "./hooks/useSheetAnimation";
 import {
   MicDropdown,
   SearchableDropdown,
   SpeakerDropdown,
-  SttDropdown,
+  SttDropdown
 } from "./dropdowns";
+import { useSheetAnimation } from "./hooks/useSheetAnimation";
+import { SettingsModalProps, SettingsValues } from "./types";
 
 export default function SettingsModal({
   visible,
@@ -28,6 +29,7 @@ export default function SettingsModal({
   onClose,
   onSave,
 }: SettingsModalProps) {
+  const { setTheme, isDark } = useTheme();
   const [values, setValues] = useState<SettingsValues>({
     ...DEFAULT_SETTINGS,
     ...initialValues,
@@ -49,6 +51,9 @@ export default function SettingsModal({
 
   const handleSave = () => {
     onSave(values);
+    if (values.theme) {
+      setTheme(values.theme);
+    }
     animateClose(onClose);
   };
 
@@ -69,7 +74,7 @@ export default function SettingsModal({
       <GestureHandlerRootView className="flex-1">
         <Animated.View
           style={{ opacity: overlayOpacity }}
-          className="absolute inset-0 bg-[rgba(120,120,130,0.35)]"
+          className="absolute inset-0 bg-[rgba(0,0,0,0.4)] dark:bg-[rgba(255,255,255,0.15)]"
         >
           <TouchableOpacity
             className="absolute inset-0"
@@ -80,14 +85,14 @@ export default function SettingsModal({
 
         <Animated.View
           style={{ transform: [{ translateY }] }}
-          className="absolute bottom-0 left-0 right-0 bg-white rounded-tl-[28px] rounded-tr-[28px] px-5 pb-11 pt-0"
+          className="absolute bottom-0 left-0 right-0 bg-white dark:bg-black rounded-tl-[28px] rounded-tr-[28px] px-5 pb-11 pt-0"
         >
           <PanGestureHandler
             onGestureEvent={onGestureEvent}
             onHandlerStateChange={onHandlerStateChange}
           >
             <Animated.View className="w-full items-center py-[14px]">
-              <View className="w-10 h-1 rounded-full bg-[#E0E0EC]" />
+              <View className="w-10 h-1 rounded-full bg-[#E0E0EC] dark:bg-[#2D2D3F]" />
             </Animated.View>
           </PanGestureHandler>
 
@@ -128,7 +133,7 @@ export default function SettingsModal({
 
           <View className="flex-row gap-3">
             <TouchableOpacity
-              className="flex-1 rounded-xl py-[15px] items-center bg-[#EEF4FF]"
+              className="flex-1 rounded-xl py-[15px] items-center bg-[#EEF4FF] dark:bg-[#2D2D3F]"
               onPress={handleCancel}
               activeOpacity={0.8}
             >

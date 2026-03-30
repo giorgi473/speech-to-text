@@ -1,16 +1,17 @@
 import SettingsModal, { SettingsValues } from "@/components/settings";
+import { useRecords } from "@/context/RecordContext";
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRecords } from "@/context/RecordContext";
 import { useRecording } from "./_layout";
 
 const LIVE_CHUNKS = [
@@ -54,6 +55,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
 export default function IndexScreen() {
   const { isRecording } = useRecording();
   const { addRecord } = useRecords();
+  const { theme } = useTheme();
   const insets = useSafeAreaInsets();
 
   const [liveText, setLiveText] = useState("");
@@ -65,7 +67,12 @@ export default function IndexScreen() {
     microphone: "default",
     punctuation: true,
     autoCorrect: false,
+    theme: theme,
   });
+
+  useEffect(() => {
+    setSettings((p) => ({ ...p, theme }));
+  }, [theme]);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;

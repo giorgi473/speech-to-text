@@ -1,5 +1,6 @@
-import React, { useRef, useState } from "react";
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useRef, useState } from "react";
 import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SearchableDropdownProps } from "../types";
 
@@ -8,6 +9,7 @@ export function SearchableDropdown({
   selected,
   onSelect,
 }: SearchableDropdownProps) {
+  const { isDark } = useTheme();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [menuLayout, setMenuLayout] = useState<{
@@ -46,17 +48,17 @@ export function SearchableDropdown({
     <View className="mb-3 z-20">
       <TouchableOpacity
         ref={triggerRef}
-        className="flex-row items-center justify-between border-[1.5px] border-[#DDE6F5] rounded-[10px] px-4 py-[14px] bg-white"
+        className="flex-row items-center justify-between border-[1.5px] border-[#DDE6F5] dark:border-[#2D2D3F] rounded-[10px] px-4 py-[14px] bg-white dark:bg-[#1E1E2E]"
         onPress={open ? handleClose : handleOpen}
         activeOpacity={0.8}
       >
-        <Text className="text-[15px] text-[#1A1A2E] font-medium">
+        <Text className="text-[15px] text-[#1A1A2E] dark:text-[#E0E0E0] font-medium">
           {selectedLabel}
         </Text>
         <Ionicons
           name={open ? "chevron-up" : "chevron-down"}
           size={18}
-          color="#555"
+          color={isDark ? "#9090A8" : "#555"}
         />
       </TouchableOpacity>
 
@@ -74,7 +76,7 @@ export function SearchableDropdown({
               left: menuLayout.x,
               width: menuLayout.width,
             }}
-            className="border-[1.5px] border-[#DDE6F5] rounded-[10px] bg-white overflow-hidden max-h-[290px]"
+            className="border-[1.5px] border-[#DDE6F5] dark:border-[#2D2D3F] rounded-[10px] bg-white dark:bg-[#1E1E2E] overflow-hidden max-h-[290px]"
           >
             <ScrollView
               className="max-h-[220px]"
@@ -85,8 +87,8 @@ export function SearchableDropdown({
                 filtered.map((opt) => (
                   <TouchableOpacity
                     key={opt.value}
-                    className={`flex-row items-center justify-between px-4 py-[13px] border-b border-[#F0F4FF] ${
-                      selected === opt.value ? "bg-[#F0F6FF]" : ""
+                    className={`flex-row items-center justify-between px-4 py-[13px] border-b border-[#F0F4FF] dark:border-[#2D2D3F] ${
+                      selected === opt.value ? "bg-[#F0F6FF] dark:bg-[#2D2D3F]" : ""
                     }`}
                     onPress={() => handleSelect(opt.value)}
                   >
@@ -94,7 +96,7 @@ export function SearchableDropdown({
                       className={`text-sm ${
                         selected === opt.value
                           ? "text-[#2D7CF6] font-semibold"
-                          : "text-[#444]"
+                          : "text-[#444] dark:text-[#9090A8]"
                       }`}
                     >
                       {opt.label}
@@ -106,7 +108,7 @@ export function SearchableDropdown({
                 ))
               ) : (
                 <View className="py-4 items-center">
-                  <Text className="text-[13px] text-[#9AA5BE]">
+                  <Text className="text-[13px] text-[#9AA5BE] dark:text-[#9090A8]">
                     შედეგი არ მოიძებნა
                   </Text>
                 </View>

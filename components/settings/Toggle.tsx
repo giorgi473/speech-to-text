@@ -14,12 +14,12 @@ export function Toggle({ label, value, onToggle }: ToggleProps) {
         className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
           value
             ? "bg-[#2D7CF6] border-[#2D7CF6]"
-            : "bg-[#F8FAFF] border-[#DDE6F5]"
+            : "bg-[#F8FAFF] dark:bg-[#2D2D3F] border-[#DDE6F5] dark:border-[#2D2D3F]"
         }`}
       >
         {value && <Ionicons name="checkmark" size={16} color="#fff" />}
       </View>
-      <Text className="text-[15px] text-[#1A1A2E] font-semibold flex-1">
+      <Text className="text-[15px] text-[#1A1A2E] dark:text-[#E0E0E0] font-semibold flex-1">
         {label}
       </Text>
     </TouchableOpacity>

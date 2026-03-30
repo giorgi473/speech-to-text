@@ -5,6 +5,7 @@ export type SettingsValues = {
   microphone: string;
   punctuation: boolean;
   autoCorrect: boolean;
+  theme: "light" | "dark";
 };
 
 export type DropdownOption = {
