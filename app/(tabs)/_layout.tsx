@@ -5,7 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react-native";
 import { router, Tabs } from "expo-router";
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "../ThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
