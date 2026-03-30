@@ -30,11 +30,10 @@ function TabBarIcon({
 const RecordingContext = createContext<{
   isRecording: boolean;
   setIsRecording: (v: boolean) => void;
-}>({ isRecording: false, setIsRecording: () => { } });
+}>({ isRecording: false, setIsRecording: () => {} });
 
 export const useRecording = () => useContext(RecordingContext);
 
-// ── Burger Button ──────────────────────────────────────────────────────────────
 function BurgerButton() {
   return (
     <TouchableOpacity
@@ -47,7 +46,6 @@ function BurgerButton() {
   );
 }
 
-// ── Flip Title ─────────────────────────────────────────────────────────────────
 function FlipTitle() {
   const [flipped, setFlipped] = useState(false);
   const translateY = useRef(new Animated.Value(0)).current;
@@ -129,7 +127,6 @@ const flipStyles = StyleSheet.create({
   },
 });
 
-// ── Record Tab Button ──────────────────────────────────────────────────────────
 function RecordTabButton(props: any) {
   const { isRecording, setIsRecording } = useContext(RecordingContext);
   const scale = useRef(new Animated.Value(1)).current;
@@ -199,7 +196,7 @@ const tabBtnStyles = StyleSheet.create({
   labelRecording: { color: "#E8504A" },
 });
 
-// ── Tab Layout ─────────────────────────────────────────────────────────────────
+
 export default function TabLayout() {
   const [isRecording, setIsRecording] = useState(false);
   const insets = useSafeAreaInsets();
