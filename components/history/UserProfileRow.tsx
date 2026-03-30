@@ -45,7 +45,7 @@ const UserProfileRow: React.FC<UserProfileRowProps> = ({ email }) => {
 
             {/* Profile Info */}
             <View className="flex-1">
-                <Text className="text-[13px] font-semibold text-[#111]">{email}</Text>
+                <Text className="text-[13px] font-semibold text-[#111] dark:text-zinc-300">{email}</Text>
                 <View className="self-start mt-[3px]">
                     <View className="bg-[#E8F5E9] rounded-md px-2 py-0.5">
                         <Text className="text-[11px] font-semibold text-[#2E7D32]">
@@ -100,15 +100,15 @@ const UserProfileRow: React.FC<UserProfileRowProps> = ({ email }) => {
                                 zIndex: 300,
                                 minWidth: 160,
                             }}
-                            className="bg-white rounded-xl border border-[#e0e8ff] shadow-md overflow-hidden"
+                            className="bg-white dark:bg-[#10102a] rounded-xl border border-white dark:border-[#252576] shadow-md overflow-hidden"
                         >
                             {LANGUAGES.map((lang, index) => (
                                 <TouchableOpacity
                                     key={lang.code}
                                     className={`flex-row items-center px-[14px] py-[11px] ${index < LANGUAGES.length - 1
-                                        ? "border-b border-b-[#eee]"
+                                        ? "border-b border-b-zinc-100 dark:border-b-[#252576]"
                                         : ""
-                                        } ${selectedLang.code === lang.code ? "bg-[#F0F6FF]" : ""}`}
+                                        } ${selectedLang.code === lang.code ? "bg-[#F0F6FF] dark:bg-blue-300" : ""}`}
                                     onPress={() => handleSelect(lang)}
                                     activeOpacity={0.7}
                                 >
@@ -116,7 +116,7 @@ const UserProfileRow: React.FC<UserProfileRowProps> = ({ email }) => {
                                     <Text
                                         className={`flex-1 text-sm font-medium ${selectedLang.code === lang.code
                                             ? "text-[#5086d7] font-semibold"
-                                            : "text-[#333]"
+                                            : "text-[#333] dark:text-white"
                                             }`}
                                     >
                                         {lang.label}
