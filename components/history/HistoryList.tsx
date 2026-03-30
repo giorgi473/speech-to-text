@@ -31,7 +31,7 @@ const HistoryList: React.FC<HistoryListProps> = ({ records, onDelete }) => {
       ListHeaderComponent={
         records.length > 0 ? (
           <Text className="text-[11px] text-[#bbb] text-center mb-1 tracking-wide">
-            ← მარჯვნიდან გადაწიეთ წასაშლელად
+            ← მარჯვნიდან გადაწიეთ წასაშლელად 
           </Text>
         ) : null
       }
