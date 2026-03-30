@@ -1,9 +1,9 @@
+import { RecordProvider } from "@/contexts/RecordContext";
 import { Stack } from "expo-router";
-import "../global.css";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
-import { RecordProvider } from "./RecordContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import "../global.css";
 
 export default function RootLayout() {
   return (

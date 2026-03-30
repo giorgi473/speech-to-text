@@ -14,14 +14,20 @@ export const useYouTubeProcessor = () => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptItem[]>([]);
-  const [alert, setAlert] = useState<{ visible: boolean; title: string; message: string }>({
+  const [alert, setAlert] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+  }>({
     visible: false,
     title: "",
     message: "",
   });
 
   const getVideoId = (url: string) => {
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]{11})/);
+    const match = url.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]{11})/,
+    );
     return match ? match[1] : null;
   };
 
@@ -46,7 +52,10 @@ export const useYouTubeProcessor = () => {
   useEffect(() => {
     const saveHistory = async () => {
       try {
-        await AsyncStorage.setItem("youtube_history", JSON.stringify(transcripts));
+        await AsyncStorage.setItem(
+          "youtube_history",
+          JSON.stringify(transcripts),
+        );
       } catch (e) {
         console.error("Failed to save history", e);
       }
@@ -65,6 +74,19 @@ export const useYouTubeProcessor = () => {
     }
   };
 
+  const deleteTranscript = async (id: number) => {
+    try {
+      const updatedTranscripts = transcripts.filter((t) => t.id !== id);
+      setTranscripts(updatedTranscripts);
+      await AsyncStorage.setItem(
+        "youtube_history",
+        JSON.stringify(updatedTranscripts),
+      );
+    } catch (e) {
+      console.error("Failed to delete transcript", e);
+    }
+  };
+
   const handleProcess = async () => {
     if (!isValid) {
       setAlert({
@@ -78,7 +100,12 @@ export const useYouTubeProcessor = () => {
     const currentVideoId = getVideoId(url);
     const isDuplicate = transcripts.some((t) => {
       const existingVideoId = getVideoId(t.url);
-      return (currentVideoId && existingVideoId && currentVideoId === existingVideoId) || t.url === url;
+      return (
+        (currentVideoId &&
+          existingVideoId &&
+          currentVideoId === existingVideoId) ||
+        t.url === url
+      );
     });
 
     if (isDuplicate) {
@@ -185,5 +212,6 @@ export const useYouTubeProcessor = () => {
     isValid,
     handleProcess,
     clearHistory,
+    deleteTranscript,
   };
 };

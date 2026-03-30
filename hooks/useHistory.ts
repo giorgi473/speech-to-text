@@ -1,4 +1,4 @@
-import { useRecords } from "@/app/RecordContext";
+import { useRecords } from "@/contexts/RecordContext";
 
 export const useHistory = () => {
   const { records, deleteRecord } = useRecords();

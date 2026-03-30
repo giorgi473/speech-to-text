@@ -13,7 +13,11 @@ export default function MusicLibraryScreen() {
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
-  const [alert, setAlert] = useState<{ visible: boolean; title: string; message: string }>({
+  const [alert, setAlert] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+  }>({
     visible: false,
     title: "",
     message: "",
@@ -105,7 +109,9 @@ export default function MusicLibraryScreen() {
             // synchronous — directly toggle scrollability on the FlatList node
             flatListRef.current?.setNativeProps({ scrollEnabled: !scrubbing });
           }}
-          onError={(msg) => setAlert({ visible: true, title: "შეცდომა", message: msg })}
+          onError={(msg) =>
+            setAlert({ visible: true, title: "შეცდომა", message: msg })
+          }
         />
       )}
 

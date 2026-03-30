@@ -1,4 +1,4 @@
-import { RecordItem } from "@/app/RecordContext";
+import { RecordItem } from "@/contexts/RecordContext";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useRef, useState } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";

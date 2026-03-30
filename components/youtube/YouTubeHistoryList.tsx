@@ -1,17 +1,19 @@
-import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { TranscriptItem } from "@/hooks/useYouTubeProcessor";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import YouTubeHistoryItem from "./YouTubeHistoryItem";
 
 interface YouTubeHistoryListProps {
   transcripts: TranscriptItem[];
   onClear: () => void;
+  onDelete: (id: number) => void;
 }
 
 const YouTubeHistoryList: React.FC<YouTubeHistoryListProps> = ({
   transcripts,
   onClear,
+  onDelete,
 }) => {
   return (
     <ScrollView
@@ -20,7 +22,7 @@ const YouTubeHistoryList: React.FC<YouTubeHistoryListProps> = ({
       showsVerticalScrollIndicator={false}
     >
       {transcripts.length > 0 && (
-        <View className="flex-row items-center justify-between px-1">
+        <View className="flex-row items-center justify-between">
           <Text className="text-[13px] font-bold text-[#9090A8] uppercase tracking-widest">
             ბოლო ტრანსკრიფციები
           </Text>
@@ -46,7 +48,7 @@ const YouTubeHistoryList: React.FC<YouTubeHistoryListProps> = ({
         </View>
       ) : (
         transcripts.map((item) => (
-          <YouTubeHistoryItem key={item.id} item={item} />
+          <YouTubeHistoryItem key={item.id} item={item} onDelete={onDelete} />
         ))
       )}
     </ScrollView>
