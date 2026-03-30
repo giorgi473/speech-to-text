@@ -6,7 +6,7 @@ import { Audio, AVPlaybackStatus } from "expo-av";
 import * as Haptics from "expo-haptics";
 import { PlayerStatus, Track } from "../../types/audio";
 import EqualizerBar from "./EqualizerBar";
-import { useTheme } from "../../app/ThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 
 interface PlayerBarProps {
   track: Track;

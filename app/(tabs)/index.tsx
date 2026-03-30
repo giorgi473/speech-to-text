@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRecords } from "../RecordContext";
+import { useRecords } from "@/context/RecordContext";
 import { useRecording } from "./_layout";
 
 const LIVE_CHUNKS = [

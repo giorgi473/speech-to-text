@@ -2,7 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Track } from "../../types/audio";
-import { useTheme } from "../../app/ThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 
 interface TrackRowProps {
   track: Track;

@@ -2,9 +2,9 @@ import { Stack } from "expo-router";
 import "../global.css";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
-import { RecordProvider } from "./RecordContext";
+import { RecordProvider } from "@/context/RecordContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { ThemeProvider, useTheme } from "./ThemeContext";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 
 function RootLayoutContent() {
   const { isDark } = useTheme();
