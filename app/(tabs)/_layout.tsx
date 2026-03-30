@@ -6,6 +6,7 @@ import { router, Tabs } from "expo-router";
 import { Animated, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
 function TabBarIcon({
